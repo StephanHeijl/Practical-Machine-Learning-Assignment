@@ -14,6 +14,11 @@ h1 {
 	line-height: 1.3em;
 	margin-bottom: 0.3em;
 }
+
+h2 { 
+	font-weight: 300;
+}
+
 .subtitle {
 	font-weight: 300;
 	font-style:italic;
@@ -97,6 +102,19 @@ h1 {
 	opacity: 0.8;
 	bottom: -2px;
 	height: 2px;
+}
+
+.cite {
+	vertical-align: super;
+    font-size: smaller;
+}
+
+.code {
+	display: inline;
+	background: #efefef;
+	padding: 3px;
+	font-family: monospace;
+	border-radius: 3px;
 }
 
 footer {

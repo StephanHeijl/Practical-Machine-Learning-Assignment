@@ -10,21 +10,54 @@
 			<h1>Practical Machine Learning Course Submission</h1>
 			<div class="subtitle">Stephan Heijl, 14/05/2015</div>
 			
-			<p>This is my submission for the Practical Machine Learning Course. Here is my website: <a href="http://www.stephanheijl.com">StephanHeijl.com</a>. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Duis iaculis sapien facilisis accumsan dignissim. Morbi fringilla semper massa. Nam consectetur bibendum luctus. Morbi vehicula odio et urna laoreet, <strong>nec venenatis risus</strong> lobortis. Aenean mauris ipsum, vulputate at tincidunt sed, aliquet pretium ligula. Suspendisse maximus est id turpis lacinia consectetur. Cras pulvinar volutpat nulla, molestie commodo sem accumsan eget. Aliquam quis massa venenatis, interdum velit in, placerat nisi. Mauris iaculis nulla sit amet mauris sagittis, quis commodo felis suscipit. <em>Etiam dapibus mattis tortor</em>. Ut est dolor, laoreet at nisl sed, tristique semper massa. </p>
+			<p>This is my submission for the Practical Machine Learning Course. I approached this project in the following fashion:
+			<ol>
+				<li><a href="#exp-data-vis">Exploratory Data visualization using Weka</a></li>
+				<li><a href="#low-var-data">Low variation data exclusion</a></li>
+				<li><a href="#pca">Principal Component Analysis</a></li>
+				<li><a href="#mla-testing">Testing different types of machine learning algorithms</a></li>
+				<li><a href="#rt-optimization">Optimization of Random Trees algorithm</a></li>
+				<li><a href="#pre-res-ana">Prediction result analysis</a></li>
+			</ol>
+			
+			</p>
+			
+			
+			<a name="exp-data-vis"></a>
+			<h2>Exploratory Data visualization using Weka</h2>
+			<p>
+				The PML training set consists of over a hundred of different variables. Using the open source machine learning program Weka<a href="#cite-1" class="cite">[1]</a>, I was able to quickly visualize the different ranges of data.
+			</p>
+			
+			
+			<a name="low-var-data"></a>
+			<h2>Low variation data exclusion</h2>
+			<p>
+				A large array of variables can be shown not contain significant variation in their data. This results in data that is either useless for machine learning, since its presence does not indicate a certain class, or can even lead to overfitting. Using R's <span class="code">NearZeroVar</span> function allowed me to filter these attributes, resulting in a leaner, more relevant dataset. This dataset was quicker to train and less likely to overfit on irrelevant data.
+			</p>
+			
+			<a name="pca"></a>
+			<h2>Principal Component Analysis</h2>
+			<p>
+				The initial data visualization step revealed a number of attributes showed very similar patterns. With principal component analysis we can merge these attributes to a more compact, more bias resistant 
+			</p>
+			
+			<!--
 			<img src="http://lorempixel.com/g/1228/500/technics/8" />
 			<div class="img-caption">
 				This is a caption for the image. This image is derived from LoremPixel.com.
 			</div>
-			<p>Here is another paragraph. Donec vehicula ipsum ut nibh posuere, ut hendrerit quam fringilla. Class aptent taciti sociosqu ad litora torquent per conubia nostra, per inceptos himenaeos. Integer cursus, leo elementum malesuada rhoncus, nulla purus aliquet lectus, ullamcorper ullamcorper libero ante nec nisi. Aliquam condimentum, diam commodo fermentum pulvinar, erat quam fringilla dolor, vel dapibus mauris odio a dui. <a href="#">Nullam non purus dictum</a>, luctus ante vel, facilisis nunc. Donec eget accumsan sapien. Nullam molestie turpis nec dui consectetur sodales. Aenean elit arcu, commodo at lectus non, ornare dapibus sem. Mauris in egestas ipsum, a sagittis tellus. In porttitor dui vel malesuada tincidunt.</p>
+			-->
 			
-			<img src="http://lorempixel.com/g/1228/500/technics/4" />
-			<div class="img-caption">
-				This is a caption for the image. This image is derived from LoremPixel.com.
-			</div>
-			
-			<p>Here is another paragraph. Donec vehicula ipsum ut nibh posuere, ut hendrerit quam fringilla. Class aptent taciti sociosqu ad litora torquent per conubia nostra, per inceptos himenaeos. Integer cursus, leo elementum malesuada rhoncus, nulla purus aliquet lectus, ullamcorper ullamcorper libero ante nec nisi. Aliquam condimentum, diam commodo fermentum pulvinar, erat quam fringilla dolor, vel dapibus mauris odio a dui. <a href="#">Nullam non purus dictum</a>, luctus ante vel, facilisis nunc. Donec eget accumsan sapien. Nullam molestie turpis nec dui consectetur sodales. Aenean elit arcu, commodo at lectus non, ornare dapibus sem. Mauris in egestas ipsum, a sagittis tellus. In porttitor dui vel malesuada tincidunt.</p>
+			<p></p>
 			
 			<footer>
+				<h2>References</h2>
+				<ol>
+					<li> Mark Hall, Eibe Frank, Geoffrey Holmes, Bernhard Pfahringer, Peter Reutemann, Ian H. Witten (2009); The WEKA Data Mining Software: An Update; SIGKDD Explorations, Volume 11, Issue 1. </li>
+				</ol>
+				
+			
 				All contents, except where otherwise noted, are the work of Stephan Heijl. With thanks to <a href="http://lorempixel.com">LoremPixel</a> for the stock imagery.<br/>
 				<em>In accordance with the Honor Code, I certify that my answers here are my own work, and that I have appropriately acknowledged all external sources (if any) that were used in this work.</em>
 				
