@@ -1,4 +1,5 @@
 # Practical-Machine-Learning-Assignment
 A repository containing the results of my work for the Coursera Practical Machine learning course.
 
-Writeup link: https://stephanheijl.github.io/practical-machine-learning-assignment
+Writeup link: http://stephanheijl.com/Practical-Machine-Learning-Assignment/
+Link to the Model.r code: https://github.com/StephanHeijl/Practical-Machine-Learning-Assignment/blob/master/Model.r
