@@ -4,12 +4,13 @@
 		<title> Practical Machine Learning Writeup </title>
 		<link href='http://fonts.googleapis.com/css?family=Merriweather:400,700,300italic,300,400italic' rel='stylesheet' type='text/css'>
 		<link href='style.css' rel='stylesheet' type='text/css'>
+		<script src="sorttable.js"></script>
 	</head>
 	<body>
 		<div class="content-wrapper">
 			<h1>Practical Machine Learning Course Submission</h1>
 			<div class="subtitle">Stephan Heijl, 14/05/2015</div>
-			
+
 			<p>This is my submission for the Practical Machine Learning Course. I approached this project in the following fashion:
 			<ol>
 				<li><a href="#exp-data-vis">Exploratory Data visualization using Weka</a></li>
@@ -34,21 +35,21 @@
 				The PML training set consists of over a hundred of different variables. Using GGPlot, I could easily visualize the data to explore any obvious patterns and necessary preprocessing steps. These diagrams were generated with the following code: <span class="code">ggplot(allData, aes(x=attribute, fill=classe)) + geom_histogram()</span>. One of the most relevant discoveries was related to the variation within the data. A large amount of attributes showed very little variance within their values. If this data is used for prediction, small outliers may significantly bias the predictor by inducing overfitting on that variable. An example is given in figure 1, below.
 
 			</p>
-				<img src="./GoodVariation.svg" class="half-size" />
-				<img src="./BadVariation.svg" class="half-size" />
-				<div class="img-caption">
-					Figure 1. The left diagram shows a variable distribution for the roll_arm attribute. There is plenty of variation in the data. The right diagram shows the distribution for avg_roll_arm. We can see that there is no real variation across the data. This makes this attribute unsuitable for prediction, as it can lead to overfitting.
-				</div>
-			
+			<img src="./GoodVariation.svg" class="half-size" />
+			<img src="./BadVariation.svg" class="half-size" />
+			<div class="img-caption">
+				Figure 1. The left diagram shows a variable distribution for the roll_arm attribute. There is plenty of variation in the data. The right diagram shows the distribution for avg_roll_arm. We can see that there is no real variation across the data. This makes this attribute unsuitable for prediction, as it can lead to overfitting.
+			</div>
+
 			<a name="data-pre-proc"></a>
 			<h2>Data preprocessing</h2>
 			<p>
-			Data preprocessing involved several steps. First, <span class="code">NA</span> values were replaced with 0 by using the following command:
-			<span class="code">sed 's/NA/o/g' ./pml-training.csv > ./pml-training-nona.csv</span>. This yields a csv file without the <span class="code">NA</span>, which
-			were causing problems when loading.
+				Data preprocessing involved several steps. First, <span class="code">NA</span> values were replaced with 0 by using the following command:
+				<span class="code">sed 's/NA/o/g' ./pml-training.csv > ./pml-training-nona.csv</span>. This yields a csv file without the <span class="code">NA</span>, which
+				were causing problems when loading.
 			</p>
 			<p>
-			In addition, before any training takes place, the columns containing metadata were filtered from the training and test sets. These columns included the ID, the username, the window columns, and the timestamps. The username was picked as metadata, as the person executing the training excercise seemed unlikely to affect the classe of the assignment. Additionally, the name of the person executing a training excercise has very little impact on any results when applying this model to a real life situation.
+				In addition, before any training takes place, the columns containing metadata were filtered from the training and test sets. These columns included the ID, the username, the window columns, and the timestamps. The username was picked as metadata, as the person executing the training excercise seemed unlikely to affect the classe of the assignment. Additionally, the name of the person executing a training excercise has very little impact on any results when applying this model to a real life situation.
 			</p>
 
 			<a name="low-var-data"></a>
@@ -56,99 +57,309 @@
 			<p>
 				As mentioned in the exploratory data visualization section, a large array of variables can be shown not contain significant variation in their data. This results in data that is either useless for machine learning, since its presence does not indicate a certain class, or can even lead to overfitting. Using R's <span class="code">NearZeroVar</span> function allowed me to filter these attributes, resulting in a leaner, more relevant dataset. As a pleasant side effect, having less attributes to train on yielded lower training times. The <span class="code">freqCut</span> argument was set to 95/45, as it yielded the best filtered results upon visual inspection of the data variation.
 			</p>
-			
+
 			<a name="pca"></a>
 			<h3>Principal Component Analysis</h3>
 			<p>
 				The initial data visualization step revealed a number of attributes showed very similar patterns. With principal component analysis we can merge these attributes to a more compact, more bias resistant variable. This also yields a reduced amount of attributes, improving training speeds.
 			</p>
-			
+
 			<!--
-			<img src="http://lorempixel.com/g/1228/500/technics/8" />
-			<div class="img-caption">
-				This is a caption for the image. This image is derived from LoremPixel.com.
-			</div>
-			-->
-			
+<img src="http://lorempixel.com/g/1228/500/technics/8" />
+<div class="img-caption">
+This is a caption for the image. This image is derived from LoremPixel.com.
+</div>
+-->
+
 			<a name="mla-testing"></a>
 			<h2>Testing different types of machine learning algorithms</h2>
 			<p>
 				As our data is very much non-linear, I decided to select a number of algorithms suited for this specific data distribution.
 				The following algorithms were selected:
-				<ul>
-					<li>RandomForest</li>
-					<li>AdaBoost (non-bagged)</li>
-					<li>AdaBoost (bagged)</li>
-					<li>Parallel Random Forest (parRF)</li>
-					<li>Model Averaged Neural Network</li>
-					<li>Naive Bayes</li>
-					<li>Stochastic Gradient Boosting</li>
-					<li>Generalized Linear Model</li>
-				</ul>
-				The Generalized Linear Model was added as a benchmark, to find how effective algorithms better suited for non-linear data perform compared to linear optimized algorithms.
+			</p>
+			<ul>
+				<li>RandomForest</li>
+				<li>Parallel Random Forest</li>
+				<li>AdaBoost (non-bagged)</li>
+				<li>AdaBoost (bagged)</li>
+				<li>Model Averaged Neural Network</li>
+				<li>Naive Bayes</li>
+				<li>Stochastic Gradient Boosting</li>
+				<li>Linear Discriminant Analysis</li>
+			</ul>
+
+			<p>
+				The Linear Discriminant Analysis Model was added as a benchmark, to find how effective algorithms better suited for non-linear data perform compared to linear optimized algorithms.
 				The detailed results for each of these algorithms can be found in the <a href="https://github.com/StephanHeijl/Practical-Machine-Learning-Assignment">Github repository</a>.
-				The results are summarized in table 1.
+				The results are summarized in table 1. You can click on the headers to sort the results.
+
 			</p>
 
-			<a name="rt-optimization"></a>
-			<h2>Optimization of Random Trees algorithm</h2>
+			<div class="table-container">
+				<div class="table-caption">
+					Table 3: Various other metrics produced by the <span class='code'>ConfusionMatrix()</span> function. All classes show 91%+ correct prediction results.
+				</div>
+				<table class="sortable">
+					<thead>
+						<tr>
+							<td id="algorithmcol">Algorithm</td>
+							<td>Accuracy score</td>
+							<td>Time taken (seconds)</td>
+							<td>Seconds per percentage point</td>
+						</tr>
+					</thead>
+					<tbody>
+
+						<tr>
+							<td>RandomForest</td>
+							<td>0.9628</td>
+							<td>1394.734</td>
+							<td>14.49</td>
+						</tr>
+
+						<tr>
+							<td>Parallel Random Forest</td>
+							<td>0.9623</td>
+							<td>726.125</td>
+							<td>7.54</td>
+						</tr>
+
+						<tr>
+							<td>AdaBag</td>
+							<td>0.42</td>
+							<td>2979.114</td>
+							<td>70.92</td>
+						</tr>
+
+						<tr>
+							<td>Linear discriminant analysis</td>
+							<td>0.4708</td>
+							<td>14.256</td>
+							<td>0.302</td>
+						</tr>
+
+						<tr>
+							<td>Stochastic Gradient Boosting</td>
+							<td>0.7581</td>
+							<td>651.031</td>
+							<td>8.58</td>
+						</tr>
+
+						<tr>
+							<td>Adaboost</td>
+							<td>0.6842</td>
+							<td>8377.779</td>
+							<td>122.43</td>
+						</tr>
+
+						<tr>
+							<td>Model Averaged Neural Network</td>
+							<td>0.5929</td>
+							<td>1639.671</td>
+							<td>27.64</td>
+						</tr>
+
+						<tr>
+							<td>Naive Bayes</td>
+							<td>0.556</td>
+							<td>696.021</td>
+							<td>12.51</td>
+						</tr>
+
+					</tbody>
+				</table>
+			</div>
+
 			<p>
-				-
+				Both algorithms based on RandomForest yield the highest accuracy scores for the tests. The Parallel Random Forest algorithm, however was almost twice as fast. This is further analyzed in the "Optimization of Random Forest algorithm" section below.
 			</p>
-			
+
+			<p>
+				Most bagged methods, including Neural networks and both AdaBoost based functions scored comparatively poorly, especially considering the time required for each to complete their training. This makes these algorithms unsuitable in both aspects.
+			</p>
+
+			<p>
+				Interestingly, the linear discriminant analysis algorithm excelled at speed, but yielded poor prediction results. This method could only be preferred for
+				very large datasets, where accuracy is trumped by a need for fast results. The poor prediction fit does confirm the assessment of the dataset as being non-linear.
+			</p>
+
+			<p> In conclusion, the RandomForest based algorithms were chosen for further analysis.</p>
+
+			<script>
+				document.getElementById("algorithmcol").click()
+			</script>
+
+			<a name="rt-optimization"></a>
+			<h2>Optimization of Random Forest algorithm</h2>
+			<p>
+				The Random Forest algorithm depends on a large amount of trees being generated. The default for the caret package is set to 300+ trees. However, analysis using Weka <a class="cite" href="#cite-1">[1]</a> shows that using a smaller amount of trees (~100) results in very similar performance, with just a few percentage points difference in accuracy. Using less trees for this algorithm will result in faster training for neglible accuracy loss. The caret package does not support changing the <span class="code">n_trees</span> argument for the Random Forest algorithm.
+			</p>
+
+			<p>
+				An example of this is shown with the Parallel RandomForest algorithm. This implementation has a lower <span class="code">n_trees</span> argument of 250.
+				Profiling the code unfortunately showed no real world parallelization in my instance, but lowering the amount of trees still increased speeds by almost 50%. There was no significant impact on accuracy. I project a further increase in speed if the parallelization is actually fully enabled.
+			</p>
+
+			<img src="./ParallelRandomForestCPUActivity.png" />
+			<div class="img-caption">
+				Figure 2: Profiling CPU activity during the operations of ParRF showed no simultaneous CPU usage throughout the run, but the different parameters still yielded a speed increase.
+			</div>
+
 			<a name="pre-res-ana"></a>
 			<h2>Prediction result analysis</h2>
 			<p>
-				-
+				As the Parallel Random Forest algorithm showed the most promise, this is what I will be using to predict the values for the test set. A full analysis of the results produced by this algorithm is included below.
+			</p>
+
+			<div class="table-container">
+				<div class="table-caption">
+					Table 2: This shows the confusion matrix for the results achieved by parRF. A high amount of true positives can be found across the board. The most significant case of false classifications can be found in the C row, where 25 cases were predicted to be C, while they actually belonged to the D classe.
+				</div>
+				<table>
+					<thead>
+						<tr>
+							<td>Prediction/Reference</td>
+							<td>A</td>
+							<td>B</td>
+							<td>C</td>
+							<td>D</td>
+							<td>E</td>
+						</tr>
+					</thead>
+					<tbody>
+
+						<tr>
+							<td>A</td>
+							<td>1087</td>
+							<td>20</td>
+							<td>7</td>
+							<td>3</td>
+							<td>0</td>
+						</tr>
+
+						<tr>
+							<td>B</td>
+							<td>8</td>
+							<td>714</td>
+							<td>6</td>
+							<td>0</td>
+							<td>8</td>
+						</tr>
+
+						<tr>
+							<td>C</td>
+							<td>11</td>
+							<td>16</td>
+							<td>659</td>
+							<td>25</td>
+							<td>6</td>
+						</tr>
+
+						<tr>
+							<td>D</td>
+							<td>8</td>
+							<td>6</td>
+							<td>10</td>
+							<td>614</td>
+							<td>6</td>
+						</tr>
+						<tr>
+							<td>E</td>
+							<td>2</td>
+							<td>3</td>
+							<td>2</td>
+							<td>1</td>
+							<td>701</td>
+						</tr>
+
+					</tbody>
+				</table>
+			</div>
+
+			<p>&nbsp;</p>
+
+			<div class="table-container">
+				<div class="table-caption">
+					Table 3: Various other metrics produced by the <span class='code'>ConfusionMatrix()</span> function. All classes show 91%+ correct prediction results.
+				</div>
+				<table class="sortable">
+<thead><tr><td>Classe</td><td>Sensitivity</td><td>Specificity</td><td>Pos Pred Value</td><td>Neg Pred Value</td><td>Prevalence</td><td>Detection Rate</td><td>Detection Prevalence</td><td>Balanced Accuracy</td></tr></thead>
+					<tbody>
+<tr><td>A</td><td>0.974</td><td>0.9893</td><td>0.9731</td><td>0.9897</td><td>0.2845</td><td>0.2771</td><td>0.2847</td><td>0.9817</td></tr>
+<tr><td>B</td><td>0.9407</td><td>0.993</td><td>0.9701</td><td>0.9859</td><td>0.1935</td><td>0.182</td><td>0.1876</td><td>0.9669</td></tr>
+<tr><td>C</td><td>0.9635</td><td>0.9821</td><td>0.9191</td><td>0.9922</td><td>0.1744</td><td>0.168</td><td>0.1828</td><td>0.9728</td></tr>
+<tr><td>D</td><td>0.9549</td><td>0.9909</td><td>0.9534</td><td>0.9912</td><td>0.1639</td><td>0.1565</td><td>0.1642</td><td>0.9729</td></tr>
+<tr><td>E</td><td>0.9723</td><td>0.9975</td><td>0.9887</td><td>0.9938</td><td>0.1838</td><td>0.1787</td><td>0.1807</td><td>0.9849</td></tr>
+						</tbody>
+</table>
+
+			</div>
+
+			<p>
+				In conclusion, an overall accuracy of 96.23% was achieved, with a Kappa value of 95.23%. Based on the interpretations of multiple researchers<a class="cite" href="#cite-3">[3]</a><a class="cite" href="#cite-4">[4]</a> this constitutes an "Excellent" or "Near perfect" conformance to the data. As such, I deem this model as usable for the task at hand.
 			</p>
 
 			<a name="r-script"></a>
 			<h2>Complete R script</h2>
 
 			<!-- SCRIPT START -->
-				<div style="overflow:auto;"><div class="geshifilter"><pre class="r geshifilter-R" style="font-family:monospace;"><a href="http://inside-r.org/r-doc/base/library"><span style="color: #003399; font-weight: bold;">library</span></a><span style="color: #009900;">&#40;</span><a href="http://inside-r.org/packages/cran/caret"><span style="">caret</span></a><span style="color: #009900;">&#41;</span>
+			<div style="overflow:auto;"><div class="geshifilter"><pre class="r geshifilter-R" style="font-family:monospace;"><a href="http://inside-r.org/r-doc/base/library"><span style="color: #003399; font-weight: bold;">library</span></a><span style="color: #009900;">&#40;</span><a href="http://inside-r.org/packages/cran/caret"><span style="">caret</span></a><span style="color: #009900;">&#41;</span>
+<a href="http://inside-r.org/r-doc/base/require"><span style="color: #003399; font-weight: bold;">require</span></a><span style="color: #009900;">&#40;</span>doParallel<span style="color: #009900;">&#41;</span>
 &nbsp;
 allData <span style="">&lt;-</span> <a href="http://inside-r.org/r-doc/utils/read.csv"><span style="color: #003399; font-weight: bold;">read.csv</span></a><span style="color: #009900;">&#40;</span><span style="color: #0000ff;">&quot;pml-training-nona.csv&quot;</span><span style="color: #339933;">,</span>header=T<span style="color: #009900;">&#41;</span> <span style="color: #666666; font-style: italic;"># Load training file</span>
 &nbsp;
 variantData <span style="">&lt;-</span> allData<span style="color: #009900;">&#91;</span><span style="color: #339933;">,</span><span style="">-</span><a href="http://inside-r.org/r-doc/base/c"><span style="color: #003399; font-weight: bold;">c</span></a><span style="color: #009900;">&#40;</span>nearZeroVar<span style="color: #009900;">&#40;</span> allData<span style="color: #339933;">,</span> saveMetrics=F<span style="color: #339933;">,</span> freqCut = <span style="color: #cc66cc;">95</span><span style="">/</span><span style="color: #cc66cc;">45</span><span style="color: #009900;">&#41;</span><span style="color: #009900;">&#41;</span><span style="color: #009900;">&#93;</span>
 metaCols <span style="">&lt;-</span> <a href="http://inside-r.org/r-doc/base/c"><span style="color: #003399; font-weight: bold;">c</span></a><span style="color: #009900;">&#40;</span><span style="color: #cc66cc;">1</span><span style="color: #339933;">,</span><span style="color: #cc66cc;">2</span><span style="color: #339933;">,</span><span style="color: #cc66cc;">3</span><span style="color: #339933;">,</span><span style="color: #cc66cc;">4</span><span style="color: #339933;">,</span><span style="color: #cc66cc;">5</span><span style="color: #339933;">,</span><span style="color: #cc66cc;">6</span><span style="color: #009900;">&#41;</span> <span style="color: #666666; font-style: italic;"># Columns with metadata</span>
 relevantData <span style="">&lt;-</span> variantData<span style="color: #009900;">&#91;</span><span style="">-</span>metaCols<span style="color: #009900;">&#93;</span>
-<span style="color: #666666; font-style: italic;">#relevantData &lt;- allData</span>
 &nbsp;
-<span style="color: #666666; font-style: italic;">#names( relevantData ) # These are all the remaining properties</span>
+<a href="http://inside-r.org/r-doc/base/set.seed"><span style="color: #003399; font-weight: bold;">set.seed</span></a><span style="color: #009900;">&#40;</span><span style="color: #cc66cc;">1</span><span style="color: #009900;">&#41;</span>
 &nbsp;
-<a href="http://inside-r.org/r-doc/base/length"><span style="color: #003399; font-weight: bold;">length</span></a><span style="color: #009900;">&#40;</span><a href="http://inside-r.org/r-doc/base/names"><span style="color: #003399; font-weight: bold;">names</span></a><span style="color: #009900;">&#40;</span>relevantData<span style="color: #009900;">&#41;</span><span style="color: #009900;">&#41;</span>
-&nbsp;
-dp <span style="">&lt;-</span> createDataPartition<span style="color: #009900;">&#40;</span>y=relevantData<span style="">$</span>classe<span style="color: #339933;">,</span> p=<span style="color: #cc66cc;">0.66</span><span style="color: #009900;">&#41;</span><span style="color: #009900;">&#91;</span><span style="color: #009900;">&#91;</span><span style="color: #cc66cc;">1</span><span style="color: #009900;">&#93;</span><span style="color: #009900;">&#93;</span>
+dp <span style="">&lt;-</span> createDataPartition<span style="color: #009900;">&#40;</span>y=relevantData<span style="">$</span>classe<span style="color: #339933;">,</span> p=<span style="color: #cc66cc;">0.80</span><span style="color: #009900;">&#41;</span><span style="color: #009900;">&#91;</span><span style="color: #009900;">&#91;</span><span style="color: #cc66cc;">1</span><span style="color: #009900;">&#93;</span><span style="color: #009900;">&#93;</span>
 trainingData <span style="">&lt;-</span> relevantData<span style="color: #009900;">&#91;</span>dp<span style="color: #339933;">,</span><span style="color: #009900;">&#93;</span>
 testingData <span style="">&lt;-</span> relevantData<span style="color: #009900;">&#91;</span><span style="">-</span>dp<span style="color: #339933;">,</span><span style="color: #009900;">&#93;</span>
 &nbsp;
+<span style="color: #666666; font-style: italic;"># Shuffle data for testing purposes</span>
 shuffledTesting <span style="">&lt;-</span> testingData<span style="color: #009900;">&#91;</span><a href="http://inside-r.org/r-doc/base/sample"><span style="color: #003399; font-weight: bold;">sample</span></a><span style="color: #009900;">&#40;</span><a href="http://inside-r.org/r-doc/base/nrow"><span style="color: #003399; font-weight: bold;">nrow</span></a><span style="color: #009900;">&#40;</span>testingData<span style="color: #009900;">&#41;</span><span style="color: #009900;">&#41;</span><span style="color: #339933;">,</span><span style="color: #009900;">&#93;</span>
 shuffledTraining <span style="">&lt;-</span> trainingData<span style="color: #009900;">&#91;</span><a href="http://inside-r.org/r-doc/base/sample"><span style="color: #003399; font-weight: bold;">sample</span></a><span style="color: #009900;">&#40;</span><a href="http://inside-r.org/r-doc/base/nrow"><span style="color: #003399; font-weight: bold;">nrow</span></a><span style="color: #009900;">&#40;</span>trainingData<span style="color: #009900;">&#41;</span><span style="color: #009900;">&#41;</span><span style="color: #339933;">,</span><span style="color: #009900;">&#93;</span>
 &nbsp;
-ctrl <span style="">&lt;-</span> trainControl<span style="color: #009900;">&#40;</span>preProcOptions = <a href="http://inside-r.org/r-doc/base/list"><span style="color: #003399; font-weight: bold;">list</span></a><span style="color: #009900;">&#40;</span>thresh = <span style="color: #cc66cc;">0.8</span><span style="color: #009900;">&#41;</span><span style="color: #009900;">&#41;</span>
-modelFit <span style="">&lt;-</span> train<span style="color: #009900;">&#40;</span> classe <span style="">~</span> .<span style="color: #339933;">,</span> <a href="http://inside-r.org/r-doc/utils/data"><span style="color: #003399; font-weight: bold;">data</span></a>=shuffledTraining<span style="color: #009900;">&#91;</span><span style="color: #cc66cc;">1</span><span style="">:</span><span style="color: #cc66cc;">1000</span><span style="color: #339933;">,</span><span style="color: #009900;">&#93;</span><span style="color: #339933;">,</span> method=<span style="color: #0000ff;">&quot;rf&quot;</span><span style="color: #339933;">,</span> <a href="http://inside-r.org/r-doc/stats/na.action"><span style="color: #003399; font-weight: bold;">na.action</span></a> = <a href="http://inside-r.org/r-doc/stats/na.omit"><span style="color: #003399; font-weight: bold;">na.omit</span></a> <span style="color: #009900;">&#41;</span>
+ctrl <span style="">&lt;-</span> trainControl<span style="color: #009900;">&#40;</span>preProcOptions = <a href="http://inside-r.org/r-doc/base/list"><span style="color: #003399; font-weight: bold;">list</span></a><span style="color: #009900;">&#40;</span>thresh = <span style="color: #cc66cc;">0.8</span><span style="color: #009900;">&#41;</span><span style="color: #339933;">,</span> allowParallel=T<span style="color: #009900;">&#41;</span>
+trainN <span style="">&lt;-</span> <a href="http://inside-r.org/r-doc/base/nrow"><span style="color: #003399; font-weight: bold;">nrow</span></a><span style="color: #009900;">&#40;</span>trainingData<span style="color: #009900;">&#41;</span>
+testN <span style="">&lt;-</span> <a href="http://inside-r.org/r-doc/base/nrow"><span style="color: #003399; font-weight: bold;">nrow</span></a><span style="color: #009900;">&#40;</span>testingData<span style="color: #009900;">&#41;</span>
 &nbsp;
-results <span style="">&lt;-</span> <a href="http://inside-r.org/r-doc/stats/predict"><span style="color: #003399; font-weight: bold;">predict</span></a><span style="color: #009900;">&#40;</span>modelFit<span style="color: #339933;">,</span> newdata=shuffledTesting<span style="color: #009900;">&#91;</span><span style="color: #cc66cc;">1</span><span style="">:</span><span style="color: #cc66cc;">1000</span><span style="color: #339933;">,</span><span style="color: #009900;">&#93;</span><span style="color: #339933;">,</span> <a href="http://inside-r.org/r-doc/stats/na.action"><span style="color: #003399; font-weight: bold;">na.action</span></a> = <a href="http://inside-r.org/r-doc/stats/na.omit"><span style="color: #003399; font-weight: bold;">na.omit</span></a><span style="color: #009900;">&#41;</span>
+ptm <span style="">&lt;-</span> <a href="http://inside-r.org/r-doc/base/proc.time"><span style="color: #003399; font-weight: bold;">proc.time</span></a><span style="color: #009900;">&#40;</span><span style="color: #009900;">&#41;</span> <span style="color: #666666; font-style: italic;"># Clock time taken</span>
 &nbsp;
-confusionMatrix<span style="color: #009900;">&#40;</span>results<span style="color: #339933;">,</span> shuffledTesting<span style="color: #009900;">&#91;</span><span style="color: #cc66cc;">1</span><span style="">:</span><span style="color: #cc66cc;">100</span><span style="color: #339933;">,</span><span style="color: #009900;">&#93;</span><span style="">$</span>classe<span style="color: #009900;">&#41;</span></pre></div></div><p><a href="http://www.inside-r.org/pretty-r" title="Created by Pretty R at inside-R.org">Created by Pretty R at inside-R.org</a></p>
+args<span style="">&lt;-</span><a href="http://inside-r.org/r-doc/base/commandArgs"><span style="color: #003399; font-weight: bold;">commandArgs</span></a><span style="color: #009900;">&#40;</span><span style="color: #000000; font-weight: bold;">TRUE</span><span style="color: #009900;">&#41;</span> <span style="color: #666666; font-style: italic;"># Use of command line arguments allows for easier parallelization with a bash script.</span>
+trainingMethod <span style="">&lt;-</span> <a href="http://inside-r.org/r-doc/base/args"><span style="color: #003399; font-weight: bold;">args</span></a><span style="color: #009900;">&#91;</span><span style="color: #cc66cc;">1</span><span style="color: #009900;">&#93;</span>
+&nbsp;
+modelFit <span style="">&lt;-</span> train<span style="color: #009900;">&#40;</span> classe <span style="">~</span> .<span style="color: #339933;">,</span> <a href="http://inside-r.org/r-doc/utils/data"><span style="color: #003399; font-weight: bold;">data</span></a>=shuffledTraining<span style="color: #009900;">&#91;</span><span style="color: #cc66cc;">1</span><span style="">:</span>trainN<span style="color: #339933;">,</span><span style="color: #009900;">&#93;</span><span style="color: #339933;">,</span> method=trainingMethod<span style="color: #339933;">,</span> trControl=ctrl<span style="color: #339933;">,</span> preProcess=<span style="color: #0000ff;">'pca'</span> <span style="color: #009900;">&#41;</span>
+<a href="http://inside-r.org/r-doc/base/warnings"><span style="color: #003399; font-weight: bold;">warnings</span></a><span style="color: #009900;">&#40;</span><span style="color: #009900;">&#41;</span>
+modelFit
+&nbsp;
+<a href="http://inside-r.org/r-doc/base/proc.time"><span style="color: #003399; font-weight: bold;">proc.time</span></a><span style="color: #009900;">&#40;</span><span style="color: #009900;">&#41;</span> <span style="">-</span> ptm <span style="color: #666666; font-style: italic;"># Stop the timer and echo result</span>
+&nbsp;
+results <span style="">&lt;-</span> <a href="http://inside-r.org/r-doc/stats/predict"><span style="color: #003399; font-weight: bold;">predict</span></a><span style="color: #009900;">&#40;</span>modelFit<span style="color: #339933;">,</span> newdata=shuffledTesting<span style="color: #009900;">&#91;</span><span style="color: #cc66cc;">1</span><span style="">:</span>testN<span style="color: #339933;">,</span><span style="color: #009900;">&#93;</span><span style="color: #009900;">&#41;</span>
+&nbsp;
+confusionMatrix<span style="color: #009900;">&#40;</span>results<span style="color: #339933;">,</span> shuffledTesting<span style="color: #009900;">&#91;</span><span style="color: #cc66cc;">1</span><span style="">:</span>testN<span style="color: #339933;">,</span><span style="color: #009900;">&#93;</span><span style="">$</span>classe<span style="color: #009900;">&#41;</span></pre></div></div><p>
+			<small>Produced with the Pretty R syntax Highlighter<a class="cite" href="#cite-2">[2]</a></small>
 
 			<!-- SCRIPT END -->
 			<a name="references"></a>
 			<footer>
 				<h2>References</h2>
 				<ul>
-					<li> Mark Hall, Eibe Frank, Geoffrey Holmes, Bernhard Pfahringer, Peter Reutemann, Ian H. Witten (2009); The WEKA Data Mining Software: An Update; SIGKDD Explorations, Volume 11, Issue 1. </li>
-					<li> Pretty R syntax highlighter - http://www.inside-r.org/pretty-r/tool </li>
+					<li><a name="cite-1"></a> Mark Hall, Eibe Frank, Geoffrey Holmes, Bernhard Pfahringer, Peter Reutemann, Ian H. Witten (2009); The WEKA Data Mining Software: An Update; SIGKDD Explorations, Volume 11, Issue 1. </li>
+					<li><a name="cite-2"></a>Pretty R syntax highlighter - http://www.inside-r.org/pretty-r/tool </li>
+					<li><a name="cite-3"></a>The measurement of observer agreement for categorical data. - Landis JR, Koch GG. Biometrics. 1977 Mar;33(1):159-74. </li>
+					<li><a name="cite-4"></a>The kappa statistic in reliability studies: use, interpretation, and sample size requirements. - Sim J1, Wright CC. Phys Ther. 2005 Mar;85(3):257-68. </li>
 				</ul>
-				
-			
+
+
 				All contents, except where otherwise noted, are the work of Stephan Heijl. With thanks to <a href="http://lorempixel.com">LoremPixel</a> for the stock imagery.<br/>
 				<em>In accordance with the Honor Code, I certify that my answers here are my own work, and that I have appropriately acknowledged all external sources (if any) that were used in this work.</em>
-				
+
 			</footer>
 		</div>
-		
+
 	</body>
 
 </html>

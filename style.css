@@ -31,7 +31,7 @@ h3:before {
     content: counter(section) "." counter(subsection) ". ";
 }
 
-li {
+ol li {
 	display: block;
 }
 ol > li:before {
@@ -40,6 +40,10 @@ ol > li:before {
 }
 ol {
 	counter-reset: item;
+}
+
+ul {
+	list-style-type: square;
 }
 
 .subtitle {
@@ -86,6 +90,55 @@ ol {
 	font-style: italic;
 }
 
+.content-wrapper .table-caption {
+	text-align: center;
+	font-style: italic;
+}
+
+table {
+	width: 100%;
+	border-collapse: collapse;
+}
+
+table thead {
+	font-weight: 900;
+	text-align: left;
+}
+table thead td {
+	cursor: pointer;
+}
+
+table td {
+	padding: 5px;
+}
+
+table tbody td:first-child {
+	border-radius: 5px 0 0 5px;
+}
+
+table tbody td:last-child {
+	border-radius: 0 5px 5px 0;
+}
+
+table tbody tr:nth-child(odd) {
+	background: #efefef;
+}
+
+table tr td:first-child {
+	font-style: italic;
+}
+
+table.sortable thead td:not(.sorttable_sorted):not(.sorttable_sorted_reverse):not(.sorttable_nosort):after {
+    content: " \25B4\25BE"
+}
+
+
+.table-container {
+	width: 120%;
+	overflow: auto;
+	margin-left: -10%;
+}
+
 @media screen and (max-width: 1280px) {
 	.content-wrapper {
 		width: 66%;	
@@ -107,6 +160,13 @@ ol {
 		margin: 0 0 0 -12.5%;	
 	}
 	
+
+.table-container {
+	width: 100%;
+	overflow: auto;
+	margin: 0;
+}
+
 	.content-wrapper .img-caption {
 		margin-top: 0;
 	}
@@ -155,7 +215,13 @@ ol {
 	border-radius: 3px;
 }
 
+
 footer {
 	opacity: 0.8;
 	text-align: right;
+}
+
+footer ul {
+	text-align: left;
+	list-style-type:decimal;
 }
