@@ -13,33 +13,54 @@
 			<p>This is my submission for the Practical Machine Learning Course. I approached this project in the following fashion:
 			<ol>
 				<li><a href="#exp-data-vis">Exploratory Data visualization using Weka</a></li>
-				<li><a href="#low-var-data">Low variation data exclusion</a></li>
-				<li><a href="#pca">Principal Component Analysis</a></li>
+				<li><a href="#data-pre-proc">Data preprocessing</a>
+					<ol>
+						<li><a href="#low-var-data">Low variation data exclusion</a></li>
+						<li><a href="#pca">Principal Component Analysis</a></li>
+					</ol>
+				</li>
+
 				<li><a href="#mla-testing">Testing different types of machine learning algorithms</a></li>
 				<li><a href="#rt-optimization">Optimization of Random Trees algorithm</a></li>
 				<li><a href="#pre-res-ana">Prediction result analysis</a></li>
+				<li><a href="#r-script">Complete R Script</a></li>
+				<li><a href="#references">References</a></li>
 			</ol>
-			
-			</p>
-			
-			
+
 			<a name="exp-data-vis"></a>
-			<h2>Exploratory Data visualization using Weka</h2>
+			<h2>Exploratory Data visualization using GGPlot</h2>
+
 			<p>
-				The PML training set consists of over a hundred of different variables. Using the open source machine learning program Weka<a href="#cite-1" class="cite">[1]</a>, I was able to quickly visualize the different ranges of data.
+				The PML training set consists of over a hundred of different variables. Using GGPlot, I could easily visualize the data to explore any obvious patterns and necessary preprocessing steps. These diagrams were generated with the following code: <span class="code">ggplot(allData, aes(x=attribute, fill=classe)) + geom_histogram()</span>. One of the most relevant discoveries was related to the variation within the data. A large amount of attributes showed very little variance within their values. If this data is used for prediction, small outliers may significantly bias the predictor by inducing overfitting on that variable. An example is given in figure 1, below.
+
 			</p>
+				<img src="./GoodVariation.svg" class="half-size" />
+				<img src="./BadVariation.svg" class="half-size" />
+				<div class="img-caption">
+					Figure 1. The left diagram shows a variable distribution for the roll_arm attribute. There is plenty of variation in the data. The right diagram shows the distribution for avg_roll_arm. We can see that there is no real variation across the data. This makes this attribute unsuitable for prediction, as it can lead to overfitting.
+				</div>
 			
-			
-			<a name="low-var-data"></a>
-			<h2>Low variation data exclusion</h2>
+			<a name="data-pre-proc"></a>
+			<h2>Data preprocessing</h2>
 			<p>
-				A large array of variables can be shown not contain significant variation in their data. This results in data that is either useless for machine learning, since its presence does not indicate a certain class, or can even lead to overfitting. Using R's <span class="code">NearZeroVar</span> function allowed me to filter these attributes, resulting in a leaner, more relevant dataset. This dataset was quicker to train and less likely to overfit on irrelevant data.
+			Data preprocessing involved several steps. First, <span class="code">NA</span> values were replaced with 0 by using the following command:
+			<span class="code">sed 's/NA/o/g' ./pml-training.csv > ./pml-training-nona.csv</span>. This yields a csv file without the <span class="code">NA</span>, which
+			were causing problems when loading.
+			</p>
+			<p>
+			In addition, before any training takes place, the columns containing metadata were filtered from the training and test sets. These columns included the ID, the username, the window columns, and the timestamps. The username was picked as metadata, as the person executing the training excercise seemed unlikely to affect the classe of the assignment. Additionally, the name of the person executing a training excercise has very little impact on any results when applying this model to a real life situation.
+			</p>
+
+			<a name="low-var-data"></a>
+			<h3>Low variation data exclusion</h3>
+			<p>
+				As mentioned in the exploratory data visualization section, a large array of variables can be shown not contain significant variation in their data. This results in data that is either useless for machine learning, since its presence does not indicate a certain class, or can even lead to overfitting. Using R's <span class="code">NearZeroVar</span> function allowed me to filter these attributes, resulting in a leaner, more relevant dataset. As a pleasant side effect, having less attributes to train on yielded lower training times. The <span class="code">freqCut</span> argument was set to 95/45, as it yielded the best filtered results upon visual inspection of the data variation.
 			</p>
 			
 			<a name="pca"></a>
-			<h2>Principal Component Analysis</h2>
+			<h3>Principal Component Analysis</h3>
 			<p>
-				The initial data visualization step revealed a number of attributes showed very similar patterns. With principal component analysis we can merge these attributes to a more compact, more bias resistant 
+				The initial data visualization step revealed a number of attributes showed very similar patterns. With principal component analysis we can merge these attributes to a more compact, more bias resistant variable. This also yields a reduced amount of attributes, improving training speeds.
 			</p>
 			
 			<!--
@@ -49,13 +70,63 @@
 			</div>
 			-->
 			
-			<p></p>
+			<a name="pca"></a>
+			<h2>Testing different types of machine learning algorithms</h2>
+			<p>
+				-
+			</p>
+
+			<a name="pca"></a>
+			<h2>Optimization of Random Trees algorithm</h2>
+			<p>
+				-
+			</p>
 			
+			<a name="pca"></a>
+			<h2>Prediction result analysis</h2>
+			<p>
+				-
+			</p>
+
+			<a name="r-script"></a>
+			<h2>Complete R script</h2>
+
+			<!-- SCRIPT START -->
+				<div style="overflow:auto;"><div class="geshifilter"><pre class="r geshifilter-R" style="font-family:monospace;"><a href="http://inside-r.org/r-doc/base/library"><span style="color: #003399; font-weight: bold;">library</span></a><span style="color: #009900;">&#40;</span><a href="http://inside-r.org/packages/cran/caret"><span style="">caret</span></a><span style="color: #009900;">&#41;</span>
+&nbsp;
+allData <span style="">&lt;-</span> <a href="http://inside-r.org/r-doc/utils/read.csv"><span style="color: #003399; font-weight: bold;">read.csv</span></a><span style="color: #009900;">&#40;</span><span style="color: #0000ff;">&quot;pml-training-nona.csv&quot;</span><span style="color: #339933;">,</span>header=T<span style="color: #009900;">&#41;</span> <span style="color: #666666; font-style: italic;"># Load training file</span>
+&nbsp;
+variantData <span style="">&lt;-</span> allData<span style="color: #009900;">&#91;</span><span style="color: #339933;">,</span><span style="">-</span><a href="http://inside-r.org/r-doc/base/c"><span style="color: #003399; font-weight: bold;">c</span></a><span style="color: #009900;">&#40;</span>nearZeroVar<span style="color: #009900;">&#40;</span> allData<span style="color: #339933;">,</span> saveMetrics=F<span style="color: #339933;">,</span> freqCut = <span style="color: #cc66cc;">95</span><span style="">/</span><span style="color: #cc66cc;">45</span><span style="color: #009900;">&#41;</span><span style="color: #009900;">&#41;</span><span style="color: #009900;">&#93;</span>
+metaCols <span style="">&lt;-</span> <a href="http://inside-r.org/r-doc/base/c"><span style="color: #003399; font-weight: bold;">c</span></a><span style="color: #009900;">&#40;</span><span style="color: #cc66cc;">1</span><span style="color: #339933;">,</span><span style="color: #cc66cc;">2</span><span style="color: #339933;">,</span><span style="color: #cc66cc;">3</span><span style="color: #339933;">,</span><span style="color: #cc66cc;">4</span><span style="color: #339933;">,</span><span style="color: #cc66cc;">5</span><span style="color: #339933;">,</span><span style="color: #cc66cc;">6</span><span style="color: #009900;">&#41;</span> <span style="color: #666666; font-style: italic;"># Columns with metadata</span>
+relevantData <span style="">&lt;-</span> variantData<span style="color: #009900;">&#91;</span><span style="">-</span>metaCols<span style="color: #009900;">&#93;</span>
+<span style="color: #666666; font-style: italic;">#relevantData &lt;- allData</span>
+&nbsp;
+<span style="color: #666666; font-style: italic;">#names( relevantData ) # These are all the remaining properties</span>
+&nbsp;
+<a href="http://inside-r.org/r-doc/base/length"><span style="color: #003399; font-weight: bold;">length</span></a><span style="color: #009900;">&#40;</span><a href="http://inside-r.org/r-doc/base/names"><span style="color: #003399; font-weight: bold;">names</span></a><span style="color: #009900;">&#40;</span>relevantData<span style="color: #009900;">&#41;</span><span style="color: #009900;">&#41;</span>
+&nbsp;
+dp <span style="">&lt;-</span> createDataPartition<span style="color: #009900;">&#40;</span>y=relevantData<span style="">$</span>classe<span style="color: #339933;">,</span> p=<span style="color: #cc66cc;">0.66</span><span style="color: #009900;">&#41;</span><span style="color: #009900;">&#91;</span><span style="color: #009900;">&#91;</span><span style="color: #cc66cc;">1</span><span style="color: #009900;">&#93;</span><span style="color: #009900;">&#93;</span>
+trainingData <span style="">&lt;-</span> relevantData<span style="color: #009900;">&#91;</span>dp<span style="color: #339933;">,</span><span style="color: #009900;">&#93;</span>
+testingData <span style="">&lt;-</span> relevantData<span style="color: #009900;">&#91;</span><span style="">-</span>dp<span style="color: #339933;">,</span><span style="color: #009900;">&#93;</span>
+&nbsp;
+shuffledTesting <span style="">&lt;-</span> testingData<span style="color: #009900;">&#91;</span><a href="http://inside-r.org/r-doc/base/sample"><span style="color: #003399; font-weight: bold;">sample</span></a><span style="color: #009900;">&#40;</span><a href="http://inside-r.org/r-doc/base/nrow"><span style="color: #003399; font-weight: bold;">nrow</span></a><span style="color: #009900;">&#40;</span>testingData<span style="color: #009900;">&#41;</span><span style="color: #009900;">&#41;</span><span style="color: #339933;">,</span><span style="color: #009900;">&#93;</span>
+shuffledTraining <span style="">&lt;-</span> trainingData<span style="color: #009900;">&#91;</span><a href="http://inside-r.org/r-doc/base/sample"><span style="color: #003399; font-weight: bold;">sample</span></a><span style="color: #009900;">&#40;</span><a href="http://inside-r.org/r-doc/base/nrow"><span style="color: #003399; font-weight: bold;">nrow</span></a><span style="color: #009900;">&#40;</span>trainingData<span style="color: #009900;">&#41;</span><span style="color: #009900;">&#41;</span><span style="color: #339933;">,</span><span style="color: #009900;">&#93;</span>
+&nbsp;
+ctrl <span style="">&lt;-</span> trainControl<span style="color: #009900;">&#40;</span>preProcOptions = <a href="http://inside-r.org/r-doc/base/list"><span style="color: #003399; font-weight: bold;">list</span></a><span style="color: #009900;">&#40;</span>thresh = <span style="color: #cc66cc;">0.8</span><span style="color: #009900;">&#41;</span><span style="color: #009900;">&#41;</span>
+modelFit <span style="">&lt;-</span> train<span style="color: #009900;">&#40;</span> classe <span style="">~</span> .<span style="color: #339933;">,</span> <a href="http://inside-r.org/r-doc/utils/data"><span style="color: #003399; font-weight: bold;">data</span></a>=shuffledTraining<span style="color: #009900;">&#91;</span><span style="color: #cc66cc;">1</span><span style="">:</span><span style="color: #cc66cc;">1000</span><span style="color: #339933;">,</span><span style="color: #009900;">&#93;</span><span style="color: #339933;">,</span> method=<span style="color: #0000ff;">&quot;rf&quot;</span><span style="color: #339933;">,</span> <a href="http://inside-r.org/r-doc/stats/na.action"><span style="color: #003399; font-weight: bold;">na.action</span></a> = <a href="http://inside-r.org/r-doc/stats/na.omit"><span style="color: #003399; font-weight: bold;">na.omit</span></a> <span style="color: #009900;">&#41;</span>
+&nbsp;
+results <span style="">&lt;-</span> <a href="http://inside-r.org/r-doc/stats/predict"><span style="color: #003399; font-weight: bold;">predict</span></a><span style="color: #009900;">&#40;</span>modelFit<span style="color: #339933;">,</span> newdata=shuffledTesting<span style="color: #009900;">&#91;</span><span style="color: #cc66cc;">1</span><span style="">:</span><span style="color: #cc66cc;">1000</span><span style="color: #339933;">,</span><span style="color: #009900;">&#93;</span><span style="color: #339933;">,</span> <a href="http://inside-r.org/r-doc/stats/na.action"><span style="color: #003399; font-weight: bold;">na.action</span></a> = <a href="http://inside-r.org/r-doc/stats/na.omit"><span style="color: #003399; font-weight: bold;">na.omit</span></a><span style="color: #009900;">&#41;</span>
+&nbsp;
+confusionMatrix<span style="color: #009900;">&#40;</span>results<span style="color: #339933;">,</span> shuffledTesting<span style="color: #009900;">&#91;</span><span style="color: #cc66cc;">1</span><span style="">:</span><span style="color: #cc66cc;">100</span><span style="color: #339933;">,</span><span style="color: #009900;">&#93;</span><span style="">$</span>classe<span style="color: #009900;">&#41;</span></pre></div></div><p><a href="http://www.inside-r.org/pretty-r" title="Created by Pretty R at inside-R.org">Created by Pretty R at inside-R.org</a></p>
+
+			<!-- SCRIPT END -->
+			<a name="references"></a>
 			<footer>
 				<h2>References</h2>
-				<ol>
+				<ul>
 					<li> Mark Hall, Eibe Frank, Geoffrey Holmes, Bernhard Pfahringer, Peter Reutemann, Ian H. Witten (2009); The WEKA Data Mining Software: An Update; SIGKDD Explorations, Volume 11, Issue 1. </li>
-				</ol>
+					<li> Pretty R syntax highlighter - http://www.inside-r.org/pretty-r/tool </li>
+				</ul>
 				
 			
 				All contents, except where otherwise noted, are the work of Stephan Heijl. With thanks to <a href="http://lorempixel.com">LoremPixel</a> for the stock imagery.<br/>
