@@ -225,8 +225,6 @@ proc.time() - ptm # Stop the timer and echo result
 confusionMatrix(modelFit)
 ~~~~
 
-Produced with the Pretty R syntax Highlighter[[2]](#cite-2)
-
 References
 ----------
 
