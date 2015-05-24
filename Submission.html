@@ -1,0 +1,1058 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title> Practical Machine Learning Writeup </title>
+		<link href='http://fonts.googleapis.com/css?family=Merriweather:400,700,300italic,300,400italic' rel='stylesheet' type='text/css'>
+		<style>
+			body {
+				font-family: "Merriweather", sans-serif;
+				color: #333;
+				overflow-x: hidden;
+				counter-reset: section subsection;
+			}
+
+			h1,h2,h3,h4,h5,h6 {
+				text-align:center;
+			}
+
+			h1 {
+				font-weight: 300;
+				font-size: 3em;
+				line-height: 1.3em;
+				margin-bottom: 0.3em;
+			}
+
+			h2,h3 {
+				font-weight: 300;
+			}
+
+
+			h2:before {
+				counter-increment: section;
+				content: counter(section) ". ";
+			}
+
+			h3:before {
+				counter-increment: subsection;
+				content: counter(section) "." counter(subsection) ". ";
+			}
+
+			ol li {
+				display: block;
+			}
+			ol > li:before {
+				content: counters(item, ".") ". ";
+				counter-increment: item;
+			}
+			ol {
+				counter-reset: item;
+			}
+
+			ul {
+				list-style-type: square;
+			}
+
+			.subtitle {
+				font-weight: 300;
+				font-style:italic;
+				margin: 0;
+				font-size: 1em;
+				text-align: center;
+			}
+
+			.content-wrapper {
+				width: 50%;
+				max-width: 1024px;
+				margin: 0 auto;
+				text-align: justify;
+				line-height: 1.5em;
+				font-size: 1.1em;
+			}
+
+
+			.content-wrapper img {
+				width: 120%;
+				margin: 2em 0 2em -10%;
+			}
+
+			.content-wrapper img.half-size {
+				width: 59%;
+				display: inline-block;
+				margin: 2em 0 2em 0;
+
+			}
+
+			.content-wrapper img.half-size:nth-child(even) {
+				margin-left: -10%;
+			}
+
+			.content-wrapper img.half-size:nth-child(odd) {
+				margin-right: -10%;
+			}
+
+			.content-wrapper .img-caption {
+				margin-top: -2em;
+				text-align: center;
+				font-style: italic;
+			}
+
+			.content-wrapper .table-caption {
+				text-align: center;
+				font-style: italic;
+			}
+
+			table {
+				width: 100%;
+				border-collapse: collapse;
+			}
+
+			table thead {
+				font-weight: 900;
+				text-align: left;
+			}
+			table thead td {
+				cursor: pointer;
+			}
+
+			table td {
+				padding: 5px;
+			}
+
+			table tbody td:first-child {
+				border-radius: 5px 0 0 5px;
+			}
+
+			table tbody td:last-child {
+				border-radius: 0 5px 5px 0;
+			}
+
+			table tbody tr:nth-child(odd) {
+				background: #efefef;
+			}
+
+			table tr td:first-child {
+				font-style: italic;
+			}
+
+			table.sortable thead td:not(.sorttable_sorted):not(.sorttable_sorted_reverse):not(.sorttable_nosort):after {
+				content: " \25B4\25BE"
+			}
+
+
+			.table-container {
+				width: 120%;
+				overflow: auto;
+				margin-left: -10%;
+			}
+
+			@media screen and (max-width: 1280px) {
+				.content-wrapper {
+					width: 66%;
+				}
+			}
+
+			@media screen and (max-width: 768px) {
+				.content-wrapper {
+					width: 80%;
+				}
+			}
+
+			@media screen and (max-width: 512px) {
+				.content-wrapper {
+					width: 90%;
+				}
+
+				.content-wrapper img {
+					margin: 0 0 0 -12.5%;
+				}
+
+
+				.table-container {
+					width: 100%;
+					overflow: auto;
+					margin: 0;
+				}
+
+				.content-wrapper .img-caption {
+					margin-top: 0;
+				}
+			}
+
+			.content-wrapper a {
+				opacity: 0.8;
+				color: inherit;
+				text-decoration: none;
+				position: relative;
+				transition: color 0.2s;
+			}
+
+			.content-wrapper a:hover {
+				color: teal;
+			}
+
+			.content-wrapper a:before {
+				content: '';
+				position: absolute;
+				width: 102%;
+				background: teal;
+				opacity: 0.4;
+				bottom:0px;
+				left: -1%;
+				height: 5px;
+				transition: all 0.2s;
+			}
+
+			.content-wrapper a:hover:before {
+				opacity: 0.8;
+				bottom: -2px;
+				height: 2px;
+			}
+
+			.cite {
+				vertical-align: super;
+				font-size: smaller;
+			}
+
+			.code {
+				display: inline;
+				background: #efefef;
+				padding: 3px;
+				font-family: monospace;
+				border-radius: 3px;
+			}
+
+
+			footer {
+				opacity: 0.8;
+				text-align: right;
+			}
+
+			footer ul {
+				text-align: left;
+				list-style-type:decimal;
+			}
+
+		</style>
+		<script>
+			/*
+  SortTable
+  version 2
+  7th April 2007
+  Stuart Langridge, http://www.kryogenix.org/code/browser/sorttable/
+
+
+		Thanks to many, many people for contributions and suggestions.
+		Licenced as X11: http://www.kryogenix.org/code/browser/licence.html
+		This basically means: do what you want with it.
+		*/
+
+
+			var stIsIE = /*@cc_on!@*/false;
+
+			sorttable = {
+				init: function() {
+					// quit if this function has already been called
+					if (arguments.callee.done) return;
+					// flag this function so we don't do the same thing twice
+					arguments.callee.done = true;
+					// kill the timer
+					if (_timer) clearInterval(_timer);
+
+					if (!document.createElement || !document.getElementsByTagName) return;
+
+					sorttable.DATE_RE = /^(\d\d?)[\/\.-](\d\d?)[\/\.-]((\d\d)?\d\d)$/;
+
+					forEach(document.getElementsByTagName('table'), function(table) {
+						if (table.className.search(/\bsortable\b/) != -1) {
+							sorttable.makeSortable(table);
+						}
+					});
+
+				},
+
+				makeSortable: function(table) {
+					if (table.getElementsByTagName('thead').length == 0) {
+						// table doesn't have a tHead. Since it should have, create one and
+						// put the first table row in it.
+						the = document.createElement('thead');
+						the.appendChild(table.rows[0]);
+						table.insertBefore(the,table.firstChild);
+					}
+					// Safari doesn't support table.tHead, sigh
+					if (table.tHead == null) table.tHead = table.getElementsByTagName('thead')[0];
+
+					if (table.tHead.rows.length != 1) return; // can't cope with two header rows
+
+					// Sorttable v1 put rows with a class of "sortbottom" at the bottom (as
+					// "total" rows, for example). This is B&R, since what you're supposed
+					// to do is put them in a tfoot. So, if there are sortbottom rows,
+					// for backwards compatibility, move them to tfoot (creating it if needed).
+					sortbottomrows = [];
+					for (var i=0; i<table.rows.length; i++) {
+						if (table.rows[i].className.search(/\bsortbottom\b/) != -1) {
+							sortbottomrows[sortbottomrows.length] = table.rows[i];
+						}
+					}
+					if (sortbottomrows) {
+						if (table.tFoot == null) {
+							// table doesn't have a tfoot. Create one.
+							tfo = document.createElement('tfoot');
+							table.appendChild(tfo);
+						}
+						for (var i=0; i<sortbottomrows.length; i++) {
+							tfo.appendChild(sortbottomrows[i]);
+						}
+						delete sortbottomrows;
+					}
+
+					// work through each column and calculate its type
+					headrow = table.tHead.rows[0].cells;
+					for (var i=0; i<headrow.length; i++) {
+						// manually override the type with a sorttable_type attribute
+						if (!headrow[i].className.match(/\bsorttable_nosort\b/)) { // skip this col
+							mtch = headrow[i].className.match(/\bsorttable_([a-z0-9]+)\b/);
+							if (mtch) { override = mtch[1]; }
+							if (mtch && typeof sorttable["sort_"+override] == 'function') {
+								headrow[i].sorttable_sortfunction = sorttable["sort_"+override];
+							} else {
+								headrow[i].sorttable_sortfunction = sorttable.guessType(table,i);
+							}
+							// make it clickable to sort
+							headrow[i].sorttable_columnindex = i;
+							headrow[i].sorttable_tbody = table.tBodies[0];
+							dean_addEvent(headrow[i],"click", sorttable.innerSortFunction = function(e) {
+
+								if (this.className.search(/\bsorttable_sorted\b/) != -1) {
+									// if we're already sorted by this column, just
+									// reverse the table, which is quicker
+									sorttable.reverse(this.sorttable_tbody);
+									this.className = this.className.replace('sorttable_sorted',
+																			'sorttable_sorted_reverse');
+									this.removeChild(document.getElementById('sorttable_sortfwdind'));
+									sortrevind = document.createElement('span');
+									sortrevind.id = "sorttable_sortrevind";
+									sortrevind.innerHTML = stIsIE ? '&nbsp<font face="webdings">5</font>' : '&nbsp;&#x25B4;';
+									this.appendChild(sortrevind);
+									return;
+								}
+								if (this.className.search(/\bsorttable_sorted_reverse\b/) != -1) {
+									// if we're already sorted by this column in reverse, just
+									// re-reverse the table, which is quicker
+									sorttable.reverse(this.sorttable_tbody);
+									this.className = this.className.replace('sorttable_sorted_reverse',
+																			'sorttable_sorted');
+									this.removeChild(document.getElementById('sorttable_sortrevind'));
+									sortfwdind = document.createElement('span');
+									sortfwdind.id = "sorttable_sortfwdind";
+									sortfwdind.innerHTML = stIsIE ? '&nbsp<font face="webdings">6</font>' : '&nbsp;&#x25BE;';
+									this.appendChild(sortfwdind);
+									return;
+								}
+
+								// remove sorttable_sorted classes
+								theadrow = this.parentNode;
+								forEach(theadrow.childNodes, function(cell) {
+									if (cell.nodeType == 1) { // an element
+										cell.className = cell.className.replace('sorttable_sorted_reverse','');
+										cell.className = cell.className.replace('sorttable_sorted','');
+									}
+								});
+								sortfwdind = document.getElementById('sorttable_sortfwdind');
+								if (sortfwdind) { sortfwdind.parentNode.removeChild(sortfwdind); }
+								sortrevind = document.getElementById('sorttable_sortrevind');
+								if (sortrevind) { sortrevind.parentNode.removeChild(sortrevind); }
+
+								this.className += ' sorttable_sorted';
+								sortfwdind = document.createElement('span');
+								sortfwdind.id = "sorttable_sortfwdind";
+								sortfwdind.innerHTML = stIsIE ? '&nbsp<font face="webdings">6</font>' : '&nbsp;&#x25BE;';
+								this.appendChild(sortfwdind);
+
+								// build an array to sort. This is a Schwartzian transform thing,
+								// i.e., we "decorate" each row with the actual sort key,
+								// sort based on the sort keys, and then put the rows back in order
+								// which is a lot faster because you only do getInnerText once per row
+								row_array = [];
+								col = this.sorttable_columnindex;
+								rows = this.sorttable_tbody.rows;
+								for (var j=0; j<rows.length; j++) {
+									row_array[row_array.length] = [sorttable.getInnerText(rows[j].cells[col]), rows[j]];
+								}
+								/* If you want a stable sort, uncomment the following line */
+								//sorttable.shaker_sort(row_array, this.sorttable_sortfunction);
+								/* and comment out this one */
+								row_array.sort(this.sorttable_sortfunction);
+
+								tb = this.sorttable_tbody;
+								for (var j=0; j<row_array.length; j++) {
+									tb.appendChild(row_array[j][1]);
+								}
+
+								delete row_array;
+							});
+						}
+					}
+				},
+
+				guessType: function(table, column) {
+					// guess the type of a column based on its first non-blank row
+					sortfn = sorttable.sort_alpha;
+					for (var i=0; i<table.tBodies[0].rows.length; i++) {
+						text = sorttable.getInnerText(table.tBodies[0].rows[i].cells[column]);
+						if (text != '') {
+							if (text.match(/^-?[£$€]?[\d,.]+%?$/)) {
+								return sorttable.sort_numeric;
+							}
+							// check for a date: dd/mm/yyyy or dd/mm/yy
+							// can have / or . or - as separator
+							// can be mm/dd as well
+							possdate = text.match(sorttable.DATE_RE)
+							if (possdate) {
+								// looks like a date
+								first = parseInt(possdate[1]);
+								second = parseInt(possdate[2]);
+								if (first > 12) {
+									// definitely dd/mm
+									return sorttable.sort_ddmm;
+								} else if (second > 12) {
+									return sorttable.sort_mmdd;
+								} else {
+									// looks like a date, but we can't tell which, so assume
+									// that it's dd/mm (English imperialism!) and keep looking
+									sortfn = sorttable.sort_ddmm;
+								}
+							}
+						}
+					}
+					return sortfn;
+				},
+
+				getInnerText: function(node) {
+					// gets the text we want to use for sorting for a cell.
+					// strips leading and trailing whitespace.
+					// this is *not* a generic getInnerText function; it's special to sorttable.
+					// for example, you can override the cell text with a customkey attribute.
+					// it also gets .value for <input> fields.
+
+					if (!node) return "";
+
+					hasInputs = (typeof node.getElementsByTagName == 'function') &&
+						node.getElementsByTagName('input').length;
+
+					if (node.getAttribute("sorttable_customkey") != null) {
+						return node.getAttribute("sorttable_customkey");
+					}
+					else if (typeof node.textContent != 'undefined' && !hasInputs) {
+						return node.textContent.replace(/^\s+|\s+$/g, '');
+					}
+					else if (typeof node.innerText != 'undefined' && !hasInputs) {
+						return node.innerText.replace(/^\s+|\s+$/g, '');
+					}
+					else if (typeof node.text != 'undefined' && !hasInputs) {
+						return node.text.replace(/^\s+|\s+$/g, '');
+					}
+					else {
+						switch (node.nodeType) {
+							case 3:
+								if (node.nodeName.toLowerCase() == 'input') {
+									return node.value.replace(/^\s+|\s+$/g, '');
+								}
+							case 4:
+								return node.nodeValue.replace(/^\s+|\s+$/g, '');
+								break;
+							case 1:
+							case 11:
+								var innerText = '';
+								for (var i = 0; i < node.childNodes.length; i++) {
+									innerText += sorttable.getInnerText(node.childNodes[i]);
+								}
+								return innerText.replace(/^\s+|\s+$/g, '');
+								break;
+							default:
+								return '';
+						}
+					}
+				},
+
+				reverse: function(tbody) {
+					// reverse the rows in a tbody
+					newrows = [];
+					for (var i=0; i<tbody.rows.length; i++) {
+						newrows[newrows.length] = tbody.rows[i];
+					}
+					for (var i=newrows.length-1; i>=0; i--) {
+						tbody.appendChild(newrows[i]);
+					}
+					delete newrows;
+				},
+
+				/* sort functions
+	each sort function takes two parameters, a and b
+	you are comparing a[0] and b[0] */
+				sort_numeric: function(a,b) {
+					aa = parseFloat(a[0].replace(/[^0-9.-]/g,''));
+					if (isNaN(aa)) aa = 0;
+					bb = parseFloat(b[0].replace(/[^0-9.-]/g,''));
+					if (isNaN(bb)) bb = 0;
+					return aa-bb;
+				},
+				sort_alpha: function(a,b) {
+					if (a[0]==b[0]) return 0;
+					if (a[0]<b[0]) return -1;
+					return 1;
+				},
+				sort_ddmm: function(a,b) {
+					mtch = a[0].match(sorttable.DATE_RE);
+					y = mtch[3]; m = mtch[2]; d = mtch[1];
+					if (m.length == 1) m = '0'+m;
+					if (d.length == 1) d = '0'+d;
+					dt1 = y+m+d;
+					mtch = b[0].match(sorttable.DATE_RE);
+					y = mtch[3]; m = mtch[2]; d = mtch[1];
+					if (m.length == 1) m = '0'+m;
+					if (d.length == 1) d = '0'+d;
+					dt2 = y+m+d;
+					if (dt1==dt2) return 0;
+					if (dt1<dt2) return -1;
+					return 1;
+				},
+				sort_mmdd: function(a,b) {
+					mtch = a[0].match(sorttable.DATE_RE);
+					y = mtch[3]; d = mtch[2]; m = mtch[1];
+					if (m.length == 1) m = '0'+m;
+					if (d.length == 1) d = '0'+d;
+					dt1 = y+m+d;
+					mtch = b[0].match(sorttable.DATE_RE);
+					y = mtch[3]; d = mtch[2]; m = mtch[1];
+					if (m.length == 1) m = '0'+m;
+					if (d.length == 1) d = '0'+d;
+					dt2 = y+m+d;
+					if (dt1==dt2) return 0;
+					if (dt1<dt2) return -1;
+					return 1;
+				},
+
+				shaker_sort: function(list, comp_func) {
+					// A stable sort function to allow multi-level sorting of data
+					// see: http://en.wikipedia.org/wiki/Cocktail_sort
+					// thanks to Joseph Nahmias
+					var b = 0;
+					var t = list.length - 1;
+					var swap = true;
+
+					while(swap) {
+						swap = false;
+						for(var i = b; i < t; ++i) {
+							if ( comp_func(list[i], list[i+1]) > 0 ) {
+								var q = list[i]; list[i] = list[i+1]; list[i+1] = q;
+								swap = true;
+							}
+						} // for
+						t--;
+
+						if (!swap) break;
+
+						for(var i = t; i > b; --i) {
+							if ( comp_func(list[i], list[i-1]) < 0 ) {
+								var q = list[i]; list[i] = list[i-1]; list[i-1] = q;
+								swap = true;
+							}
+						} // for
+						b++;
+
+					} // while(swap)
+				}
+			}
+
+			/* ******************************************************************
+										  Supporting functions: bundled here to avoid depending on a library
+										  ****************************************************************** */
+
+			// Dean Edwards/Matthias Miller/John Resig
+
+			/* for Mozilla/Opera9 */
+			if (document.addEventListener) {
+				document.addEventListener("DOMContentLoaded", sorttable.init, false);
+			}
+
+			/* for Internet Explorer */
+			/*@cc_on @*/
+			/*@if (@_win32)
+										  document.write("<script id=__ie_onload defer src=javascript:void(0)><\/script>");
+										  var script = document.getElementById("__ie_onload");
+										  script.onreadystatechange = function() {
+										  if (this.readyState == "complete") {
+										  sorttable.init(); // call the onload handler
+										  }
+										  };
+										  /*@end @*/
+
+			/* for Safari */
+			if (/WebKit/i.test(navigator.userAgent)) { // sniff
+				var _timer = setInterval(function() {
+					if (/loaded|complete/.test(document.readyState)) {
+						sorttable.init(); // call the onload handler
+					}
+				}, 10);
+			}
+
+			/* for other browsers */
+			window.onload = sorttable.init;
+
+			// written by Dean Edwards, 2005
+			// with input from Tino Zijdel, Matthias Miller, Diego Perini
+
+			// http://dean.edwards.name/weblog/2005/10/add-event/
+
+			function dean_addEvent(element, type, handler) {
+				if (element.addEventListener) {
+					element.addEventListener(type, handler, false);
+				} else {
+					// assign each event handler a unique ID
+					if (!handler.$$guid) handler.$$guid = dean_addEvent.guid++;
+					// create a hash table of event types for the element
+					if (!element.events) element.events = {};
+					// create a hash table of event handlers for each element/event pair
+					var handlers = element.events[type];
+					if (!handlers) {
+						handlers = element.events[type] = {};
+						// store the existing event handler (if there is one)
+						if (element["on" + type]) {
+							handlers[0] = element["on" + type];
+						}
+					}
+					// store the event handler in the hash table
+					handlers[handler.$$guid] = handler;
+					// assign a global event handler to do all the work
+					element["on" + type] = handleEvent;
+				}
+			};
+			// a counter used to create unique IDs
+			dean_addEvent.guid = 1;
+
+			function removeEvent(element, type, handler) {
+				if (element.removeEventListener) {
+					element.removeEventListener(type, handler, false);
+				} else {
+					// delete the event handler from the hash table
+					if (element.events && element.events[type]) {
+						delete element.events[type][handler.$$guid];
+					}
+				}
+			};
+
+			function handleEvent(event) {
+				var returnValue = true;
+				// grab the event object (IE uses a global event object)
+				event = event || fixEvent(((this.ownerDocument || this.document || this).parentWindow || window).event);
+				// get a reference to the hash table of event handlers
+				var handlers = this.events[event.type];
+				// execute each event handler
+				for (var i in handlers) {
+					this.$$handleEvent = handlers[i];
+					if (this.$$handleEvent(event) === false) {
+						returnValue = false;
+					}
+				}
+				return returnValue;
+			};
+
+			function fixEvent(event) {
+				// add W3C standard event methods
+				event.preventDefault = fixEvent.preventDefault;
+				event.stopPropagation = fixEvent.stopPropagation;
+				return event;
+			};
+			fixEvent.preventDefault = function() {
+				this.returnValue = false;
+			};
+			fixEvent.stopPropagation = function() {
+				this.cancelBubble = true;
+			}
+
+			// Dean's forEach: http://dean.edwards.name/base/forEach.js
+			/*
+		forEach, version 1.0
+		Copyright 2006, Dean Edwards
+		License: http://www.opensource.org/licenses/mit-license.php
+		*/
+
+			// array-like enumeration
+			if (!Array.forEach) { // mozilla already supports this
+				Array.forEach = function(array, block, context) {
+					for (var i = 0; i < array.length; i++) {
+						block.call(context, array[i], i, array);
+					}
+				};
+			}
+
+			// generic enumeration
+			Function.prototype.forEach = function(object, block, context) {
+				for (var key in object) {
+					if (typeof this.prototype[key] == "undefined") {
+						block.call(context, object[key], key, object);
+					}
+				}
+			};
+
+			// character enumeration
+			String.forEach = function(string, block, context) {
+				Array.forEach(string.split(""), function(chr, index) {
+					block.call(context, chr, index, string);
+				});
+			};
+
+			// globally resolve forEach enumeration
+			var forEach = function(object, block, context) {
+				if (object) {
+					var resolve = Object; // default
+					if (object instanceof Function) {
+						// functions have a "length" property
+						resolve = Function;
+					} else if (object.forEach instanceof Function) {
+						// the object implements a custom forEach method so use that
+						object.forEach(block, context);
+						return;
+					} else if (typeof object == "string") {
+						// the object is a string
+						resolve = String;
+					} else if (typeof object.length == "number") {
+						// the object is array-like
+						resolve = Array;
+					}
+					resolve.forEach(object, block, context);
+				}
+			};
+
+
+		</script>
+		<meta name="viewport" content="width=device-width; initial-scale=1.0; maximum-scale=1.0; user-scalable=0;" />
+
+	</head>
+	<body>
+		<div class="content-wrapper">
+			<h1>Practical Machine Learning Course Submission</h1>
+			<div class="subtitle">Stephan Heijl, 14/05/2015</div>
+
+			<p>This is my submission for the Practical Machine Learning Course. I approached this project in the following fashion:
+			<ol>
+				<li><a href="#exp-data-vis">Exploratory Data visualization using Weka</a></li>
+				<li><a href="#data-pre-proc">Data preprocessing</a>
+					<ol>
+						<li><a href="#low-var-data">Low variation data exclusion</a></li>
+						<li><a href="#pca">Principal Component Analysis</a></li>
+					</ol>
+				</li>
+
+				<li><a href="#mla-testing">Testing different types of machine learning algorithms</a></li>
+				<li><a href="#rt-optimization">Optimization of Random Trees algorithm</a></li>
+				<li><a href="#pre-res-ana">Prediction result analysis</a></li>
+				<li><a href="#r-script">Complete R Script</a></li>
+				<li><a href="#references">References</a></li>
+			</ol>
+
+			<a name="exp-data-vis"></a>
+			<h2>Exploratory Data visualization using GGPlot</h2>
+
+			<p>
+				The PML training set consists of over a hundred of different variables. Using GGPlot, I could easily visualize the data to explore any obvious patterns and necessary preprocessing steps. One of the most relevant discoveries was related to the variation within the data. A large amount of attributes showed very little variance within their values. If this data is used for prediction, small outliers may significantly bias the predictor by inducing overfitting on that variable. An example is given in figure 1, below.
+
+			</p>
+			<img src="./GoodVariation.svg" class="half-size" />
+			<img src="./BadVariation.svg" class="half-size" />
+			<div class="img-caption">
+				Figure 1. The left diagram shows a variable distribution for the roll_arm attribute. There is plenty of variation in the data. The right diagram shows the distribution for avg_roll_arm. We can see that there is no real variation across the data. This makes this attribute unsuitable for prediction, as it can lead to overfitting. These diagrams were generated with the following code: <span class="code">ggplot(allData, aes(x=attribute, fill=classe)) + geom_histogram()</span>.
+			</div>
+
+			<a name="data-pre-proc"></a>
+			<h2>Data preprocessing</h2>
+			<p>
+				Data preprocessing involved several steps. First, <span class="code">NA</span> values were replaced with 0 by using the following command:
+				<span class="code">sed 's/NA/o/g' ./pml-training.csv > ./pml-training-nona.csv</span>. This yields a csv file without the <span class="code">NA</span>, which
+				were causing problems when loading.
+			</p>
+			<p>
+				In addition, before any training takes place, the columns containing metadata were filtered from the training and test sets. These columns included the ID, the username, the window columns, and the timestamps. The username was picked as metadata, as the person executing the training excercise seemed unlikely to affect the classe of the assignment. Additionally, the name of the person executing a training excercise has very little impact on any results when applying this model to a real life situation.
+			</p>
+
+			<a name="low-var-data"></a>
+			<h3>Low variation data exclusion</h3>
+			<p>
+				As mentioned in the exploratory data visualization section, a large array of variables can be shown not contain significant variation in their data. This results in data that is either useless for machine learning, since its presence does not indicate a certain class, or can even lead to overfitting. Using R's <span class="code">NearZeroVar</span> function allowed me to filter these attributes, resulting in a leaner, more relevant dataset. As a pleasant side effect, having less attributes to train on yielded lower training times. The <span class="code">freqCut</span> argument was set to 95/45, as it yielded the best filtered results upon visual inspection of the data variation.
+			</p>
+
+			<a name="pca"></a>
+			<h3>Principal Component Analysis</h3>
+			<p>
+				The initial data visualization step revealed a number of attributes showed very similar patterns. With principal component analysis we can merge these attributes to a more compact, more bias resistant variable. This also yields a reduced amount of attributes, improving training speeds.
+			</p>
+
+			<!--
+<img src="http://lorempixel.com/g/1228/500/technics/8" />
+<div class="img-caption">
+This is a caption for the image. This image is derived from LoremPixel.com.
+</div>
+-->
+
+			<a name="mla-testing"></a>
+			<h2>Testing different types of machine learning algorithms</h2>
+			<p>
+				As our data is very much non-linear, I decided to select a number of algorithms suited for this specific data distribution.
+				The following algorithms were selected:
+			</p>
+			<ul>
+				<li>RandomForest</li>
+				<li>Parallel Random Forest</li>
+				<li>AdaBoost (non-bagged)</li>
+				<li>AdaBoost (bagged)</li>
+				<li>Model Averaged Neural Network</li>
+				<li>Naive Bayes</li>
+				<li>Stochastic Gradient Boosting</li>
+				<li>Linear Discriminant Analysis</li>
+			</ul>
+
+			<p>
+				The Linear Discriminant Analysis Model was added as a benchmark, to find how effective algorithms better suited for non-linear data perform compared to linear optimized algorithms.
+				The detailed results for each of these algorithms can be found in the <a href="https://github.com/StephanHeijl/Practical-Machine-Learning-Assignment">Github repository</a>.
+				The results are summarized in table 1. You can click on the headers to sort the results. All these tests were performed with 10-fold cross validation.
+			</p>
+
+			<div class="table-container">
+				<div class="table-caption">
+					Table 1: This table shows both the accuracy and time performances for 10-fold cross validation for each of the algorithms. The last column shows the time/performance ratio.
+					Click on any of the headers to sort the table by that attribute.
+				</div>
+				<table class="sortable">
+					<thead>
+						<tr>
+							<td id="algorithmcol">Algorithm</td>
+							<td>Accuracy score</td>
+							<td>Time taken (seconds)</td>
+							<td>Seconds per percentage point</td>
+						</tr>
+					</thead>
+					<tbody>
+
+						<tr>
+							<td>RandomForest</td>
+							<td>0.9697</td>
+							<td>922.447</td>
+							<td>9.513</td>
+						</tr>
+
+						<tr>
+							<td>Parallel Random Forest</td>
+							<td>0.9699</td>
+							<td>600.904</td>
+							<td>6.196
+							</td>
+						</tr>
+
+						<tr>
+							<td>AdaBag</td>
+							<td>0.4138</td>
+							<td>1645.114</td>
+							<td>39.756
+							</td>
+						</tr>
+
+						<tr>
+							<td>Linear discriminant analysis</td>
+							<td>0.4678</td>
+							<td>6.530</td>
+							<td>0.14
+							</td>
+						</tr>
+
+						<tr>
+							<td>Stochastic Gradient Boosting</td>
+							<td>0.7574</td>
+							<td>533.162</td>
+							<td>7.039
+							</td>
+						</tr>
+
+						<tr>
+							<td>Adaboost</td>
+							<td>0.6769</td>
+							<td>3823.220</td>
+							<td>56.481
+							</td>
+						</tr>
+
+						<tr>
+							<td>Model Averaged Neural Network</td>
+							<td>0.5883</td>
+							<td>855.590</td>
+							<td>14.543
+							</td>
+						</tr>
+
+						<tr>
+							<td>Naive Bayes</td>
+							<td>0.5574</td>
+							<td>125.745</td>
+							<td>2.256
+							</td>
+						</tr>
+
+					</tbody>
+				</table>
+			</div>
+
+			<p>
+				Both algorithms based on RandomForest yield the highest accuracy scores for the tests. The Parallel Random Forest algorithm, however was over 50% faster. This is further analyzed in the "Optimization of Random Forest algorithm" section below.
+			</p>
+
+			<p>
+				Most bagged methods, including Neural networks and both AdaBoost based functions scored comparatively poorly, especially considering the time required for each to complete their training. This makes these algorithms unsuitable in both aspects.
+			</p>
+
+			<p>
+				Interestingly, the linear discriminant analysis algorithm excelled at speed, but yielded poor prediction results. This method could only be preferred for
+				very large datasets, where accuracy is trumped by a need for fast results. The poor prediction fit does confirm the assessment of the dataset as being non-linear.
+			</p>
+
+			<p> In conclusion, the RandomForest based algorithms were chosen for further analysis.</p>
+
+			<script>
+				document.getElementById("algorithmcol").click()
+			</script>
+
+			<a name="rt-optimization"></a>
+			<h2>Optimization of Random Forest algorithm</h2>
+			<p>
+				The Random Forest algorithm depends on a large amount of trees being generated. The default for the caret package is set to 300+ trees. However, analysis using Weka <a class="cite" href="#cite-1">[1]</a> shows that using a smaller amount of trees (~100) results in very similar performance, with just a few percentage points difference in accuracy. Using less trees for this algorithm will result in faster training for neglible accuracy loss. The caret package does not support changing the <span class="code">n_trees</span> argument for the Random Forest algorithm.
+			</p>
+
+			<p>
+				An example of this is shown with the Parallel RandomForest algorithm. This implementation has a lower <span class="code">n_trees</span> argument of 250.
+				Profiling the code unfortunately showed no real world parallelization in my instance, but lowering the amount of trees still increased speeds by over 50%. There was no significant impact on accuracy. I project a further increase in speed if the parallelization is actually fully enabled.
+			</p>
+
+			<img src="./ParallelRandomForestCPUActivity.png" />
+			<div class="img-caption">
+				Figure 2: Profiling CPU activity during the operations of ParRF showed no simultaneous CPU usage throughout the run, but the different parameters still yielded a speed increase.
+			</div>
+
+			<a name="pre-res-ana"></a>
+			<h2>Prediction result analysis</h2>
+			<p>
+				As the Parallel Random Forest algorithm showed the most promise, this is what I will be using to predict the values for the test set. A full analysis of the results produced by this algorithm is included below.
+			</p>
+
+			<div class="table-container">
+				<div class="table-caption">
+					Table 2: This shows the confusion matrix for the results achieved by parRF. A high amount of true positives can be found across the board. These are based on the average scores for the cross validation, so the total is a little bit off from the sample size of 19662.
+				</div>
+				<table>
+					<thead>
+						<tr>
+							<td>Prediction/Reference</td>
+							<td>A</td>
+							<td>B</td>
+							<td>C</td>
+							<td>D</td>
+							<td>E</td>
+						</tr>
+					</thead>
+					<tbody><tr><td>A</td>
+						<td>5435</td>
+						<td>98</td>
+						<td>39</td>
+						<td>20</td>
+						<td>20</td>
+						</tr>
+						<tr><td>B</td>
+							<td>39</td>
+							<td>3591</td>
+							<td>59</td>
+							<td>20</td>
+							<td>39</td>
+						</tr>
+						<tr><td>C</td>
+							<td>59</td>
+							<td>98</td>
+							<td>3257</td>
+							<td>157</td>
+							<td>39</td>
+						</tr>
+						<tr><td>D</td>
+							<td>39</td>
+							<td>20</td>
+							<td>39</td>
+							<td>3002</td>
+							<td>39</td>
+						</tr>
+						<tr><td>E</td>
+							<td>20</td>
+							<td>20</td>
+							<td>20</td>
+							<td>20</td>
+							<td>3512</td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
+
+
+			<p>
+				In conclusion, an overall accuracy of 96.99% was achieved in the cross validation test, with a Kappa value of 96.2%. Based on the cross-validation test, I estimate the out-of-sample error rate to be approximately 3%. Based on the interpretations of multiple researchers<a class="cite" href="#cite-3">[3]</a><a class="cite" href="#cite-4">[4]</a> this constitutes an "Excellent" or "Near perfect" conformance to the data. As such, I deem this model as usable for the task at hand.
+			</p>
+
+			<a name="r-script"></a>
+			<h2>Complete R script</h2>
+
+			<!-- SCRIPT START -->
+			<div style="overflow:auto;"><div class="geshifilter"><pre class="r geshifilter-R" style="font-family:monospace;"><a href="http://inside-r.org/r-doc/base/library"><span style="color: #003399; font-weight: bold;">library</span></a><span style="color: #009900;">&#40;</span><a href="http://inside-r.org/packages/cran/caret"><span style="">caret</span></a><span style="color: #009900;">&#41;</span>
+<a href="http://inside-r.org/r-doc/base/require"><span style="color: #003399; font-weight: bold;">require</span></a><span style="color: #009900;">&#40;</span>doParallel<span style="color: #009900;">&#41;</span>
+&nbsp;
+allData <span style="">&lt;-</span> <a href="http://inside-r.org/r-doc/utils/read.csv"><span style="color: #003399; font-weight: bold;">read.csv</span></a><span style="color: #009900;">&#40;</span><span style="color: #0000ff;">&quot;pml-training-nona.csv&quot;</span><span style="color: #339933;">,</span>header=T<span style="color: #009900;">&#41;</span> <span style="color: #666666; font-style: italic;"># Load training file</span>
+&nbsp;
+variantData <span style="">&lt;-</span> allData<span style="color: #009900;">&#91;</span><span style="color: #339933;">,</span><span style="">-</span><a href="http://inside-r.org/r-doc/base/c"><span style="color: #003399; font-weight: bold;">c</span></a><span style="color: #009900;">&#40;</span>nearZeroVar<span style="color: #009900;">&#40;</span> allData<span style="color: #339933;">,</span> saveMetrics=F<span style="color: #339933;">,</span> freqCut = <span style="color: #cc66cc;">95</span><span style="">/</span><span style="color: #cc66cc;">45</span><span style="color: #009900;">&#41;</span><span style="color: #009900;">&#41;</span><span style="color: #009900;">&#93;</span>
+metaCols <span style="">&lt;-</span> <a href="http://inside-r.org/r-doc/base/c"><span style="color: #003399; font-weight: bold;">c</span></a><span style="color: #009900;">&#40;</span><span style="color: #cc66cc;">1</span><span style="color: #339933;">,</span><span style="color: #cc66cc;">2</span><span style="color: #339933;">,</span><span style="color: #cc66cc;">3</span><span style="color: #339933;">,</span><span style="color: #cc66cc;">4</span><span style="color: #339933;">,</span><span style="color: #cc66cc;">5</span><span style="color: #339933;">,</span><span style="color: #cc66cc;">6</span><span style="color: #009900;">&#41;</span> <span style="color: #666666; font-style: italic;"># Columns with metadata</span>
+trainingData <span style="">&lt;-</span> variantData<span style="color: #009900;">&#91;</span><span style="">-</span>metaCols<span style="color: #009900;">&#93;</span>
+&nbsp;
+<a href="http://inside-r.org/r-doc/base/set.seed"><span style="color: #003399; font-weight: bold;">set.seed</span></a><span style="color: #009900;">&#40;</span><span style="color: #cc66cc;">1</span><span style="color: #009900;">&#41;</span>
+&nbsp;
+ctrl <span style="">&lt;-</span> trainControl<span style="color: #009900;">&#40;</span>	preProcOptions = <a href="http://inside-r.org/r-doc/base/list"><span style="color: #003399; font-weight: bold;">list</span></a><span style="color: #009900;">&#40;</span>thresh = <span style="color: #cc66cc;">0.8</span><span style="color: #009900;">&#41;</span><span style="color: #339933;">,</span>
+						allowParallel=T<span style="color: #339933;">,</span>
+						savePredictions=T<span style="color: #339933;">,</span>
+						method = <span style="color: #0000ff;">&quot;repeatedcv&quot;</span><span style="color: #339933;">,</span>
+						number = <span style="color: #cc66cc;">10</span>
+						<span style="color: #009900;">&#41;</span>
+&nbsp;
+ptm <span style="">&lt;-</span> <a href="http://inside-r.org/r-doc/base/proc.time"><span style="color: #003399; font-weight: bold;">proc.time</span></a><span style="color: #009900;">&#40;</span><span style="color: #009900;">&#41;</span> <span style="color: #666666; font-style: italic;"># Clock time taken</span>
+&nbsp;
+args<span style="">&lt;-</span><a href="http://inside-r.org/r-doc/base/commandArgs"><span style="color: #003399; font-weight: bold;">commandArgs</span></a><span style="color: #009900;">&#40;</span><span style="color: #000000; font-weight: bold;">TRUE</span><span style="color: #009900;">&#41;</span> <span style="color: #666666; font-style: italic;"># Use of command line arguments allows for easier parallelization with a bash script.</span>
+trainingMethod <span style="">&lt;-</span> <a href="http://inside-r.org/r-doc/base/args"><span style="color: #003399; font-weight: bold;">args</span></a><span style="color: #009900;">&#91;</span><span style="color: #cc66cc;">1</span><span style="color: #009900;">&#93;</span>
+&nbsp;
+modelFit <span style="">&lt;-</span> train<span style="color: #009900;">&#40;</span> classe <span style="">~</span> .<span style="color: #339933;">,</span> <a href="http://inside-r.org/r-doc/utils/data"><span style="color: #003399; font-weight: bold;">data</span></a>=trainingData<span style="color: #339933;">,</span> method=trainingMethod<span style="color: #339933;">,</span> trControl=ctrl<span style="color: #339933;">,</span> preProcess=<span style="color: #0000ff;">'pca'</span> <span style="color: #009900;">&#41;</span>
+modelFit
+&nbsp;
+<a href="http://inside-r.org/r-doc/base/proc.time"><span style="color: #003399; font-weight: bold;">proc.time</span></a><span style="color: #009900;">&#40;</span><span style="color: #009900;">&#41;</span> <span style="">-</span> ptm <span style="color: #666666; font-style: italic;"># Stop the timer and echo result</span>
+&nbsp;
+confusionMatrix<span style="color: #009900;">&#40;</span>modelFit<span style="color: #009900;">&#41;</span></pre></div></div>
+			<small>Produced with the Pretty R syntax Highlighter<a class="cite" href="#cite-2">[2]</a></small>
+
+			<!-- SCRIPT END -->
+			<a name="references"></a>
+			<footer>
+				<h2>References</h2>
+				<ul>
+					<li><a name="cite-1"></a> Mark Hall, Eibe Frank, Geoffrey Holmes, Bernhard Pfahringer, Peter Reutemann, Ian H. Witten (2009); The WEKA Data Mining Software: An Update; SIGKDD Explorations, Volume 11, Issue 1. </li>
+					<li><a name="cite-2"></a>Pretty R syntax highlighter - http://www.inside-r.org/pretty-r/tool </li>
+					<li><a name="cite-3"></a>The measurement of observer agreement for categorical data. - Landis JR, Koch GG. Biometrics. 1977 Mar;33(1):159-74. </li>
+					<li><a name="cite-4"></a>The kappa statistic in reliability studies: use, interpretation, and sample size requirements. - Sim J1, Wright CC. Phys Ther. 2005 Mar;85(3):257-68. </li>
+				</ul>
+
+
+				All contents, except where otherwise noted, are the work of Stephan Heijl.<br/>
+				<em>In accordance with the Honor Code, I certify that my answers here are my own work, and that I have appropriately acknowledged all external sources (if any) that were used in this work.</em>
+
+			</footer>
+		</div>
+
+	</body>
+
+</html>
