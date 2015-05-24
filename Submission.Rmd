@@ -30,22 +30,22 @@ data is used for prediction, small outliers may significantly bias the
 predictor by inducing overfitting on that variable. An example is given
 in figure 1, below.
 
-![](./GoodVariation.svg) ![](./BadVariation.svg)
+![](./GoodVariation.png) ![](./BadVariation.png)
 
 Figure 1. The left diagram shows a variable distribution for the
-roll\_arm attribute. There is plenty of variation in the data. The right
-diagram shows the distribution for avg\_roll\_arm. We can see that there
+`roll\_arm` attribute. There is plenty of variation in the data. The right
+diagram shows the distribution for `avg\_roll\_arm`. We can see that there
 is no real variation across the data. This makes this attribute
 unsuitable for prediction, as it can lead to overfitting. These diagrams
-were generated with the following code: ggplot(allData, aes(x=attribute,
-fill=classe)) + geom\_histogram().
+were generated with the following code: `ggplot(allData, aes(x=attribute,
+fill=classe)) + geom\_histogram().`
 
 Data preprocessing
 ------------------
 
 Data preprocessing involved several steps. First, NA values were
-replaced with 0 by using the following command: sed 's/NA/o/g'
-./pml-training.csv \> ./pml-training-nona.csv. This yields a csv file
+replaced with 0 by using the following command: `sed 's/NA/o/g'
+./pml-training.csv \> ./pml-training-nona.csv`. This yields a csv file
 without the NA, which were causing problems when loading.
 
 In addition, before any training takes place, the columns containing
@@ -63,10 +63,10 @@ As mentioned in the exploratory data visualization section, a large
 array of variables can be shown not contain significant variation in
 their data. This results in data that is either useless for machine
 learning, since its presence does not indicate a certain class, or can
-even lead to overfitting. Using R's NearZeroVar function allowed me to
+even lead to overfitting. Using R's `NearZeroVar` function allowed me to
 filter these attributes, resulting in a leaner, more relevant dataset.
 As a pleasant side effect, having less attributes to train on yielded
-lower training times. The freqCut argument was set to 95/45, as it
+lower training times. The `freqCut` argument was set to 95/45, as it
 yielded the best filtered results upon visual inspection of the data
 variation.
 
@@ -99,14 +99,11 @@ how effective algorithms better suited for non-linear data perform
 compared to linear optimized algorithms. The detailed results for each
 of these algorithms can be found in the [Github
 repository](https://github.com/StephanHeijl/Practical-Machine-Learning-Assignment).
-The results are summarized in table 1. You can click on the headers to
-sort the results. All these tests were performed with 10-fold cross
-validation.
+The results are summarized in table 1. 
 
 Table 1: This table shows both the accuracy and time performances for
 10-fold cross validation for each of the algorithms. The last column
-shows the time/performance ratio. Click on any of the headers to sort
-the table by that attribute.
+shows the time/performance ratio.
 
 | Algorithm                     | Accuracy score | Time taken (seconds) | Seconds per percentage point | 
 |-------------------------------|----------------|----------------------|------------------------------| 
