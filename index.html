@@ -34,13 +34,13 @@
 			<h2>Exploratory Data visualization using GGPlot</h2>
 
 			<p>
-				The PML training set consists of over a hundred of different variables. Using GGPlot, I could easily visualize the data to explore any obvious patterns and necessary preprocessing steps. These diagrams were generated with the following code: <span class="code">ggplot(allData, aes(x=attribute, fill=classe)) + geom_histogram()</span>. One of the most relevant discoveries was related to the variation within the data. A large amount of attributes showed very little variance within their values. If this data is used for prediction, small outliers may significantly bias the predictor by inducing overfitting on that variable. An example is given in figure 1, below.
+				The PML training set consists of over a hundred of different variables. Using GGPlot, I could easily visualize the data to explore any obvious patterns and necessary preprocessing steps. One of the most relevant discoveries was related to the variation within the data. A large amount of attributes showed very little variance within their values. If this data is used for prediction, small outliers may significantly bias the predictor by inducing overfitting on that variable. An example is given in figure 1, below.
 
 			</p>
 			<img src="./GoodVariation.svg" class="half-size" />
 			<img src="./BadVariation.svg" class="half-size" />
 			<div class="img-caption">
-				Figure 1. The left diagram shows a variable distribution for the roll_arm attribute. There is plenty of variation in the data. The right diagram shows the distribution for avg_roll_arm. We can see that there is no real variation across the data. This makes this attribute unsuitable for prediction, as it can lead to overfitting.
+				Figure 1. The left diagram shows a variable distribution for the roll_arm attribute. There is plenty of variation in the data. The right diagram shows the distribution for avg_roll_arm. We can see that there is no real variation across the data. This makes this attribute unsuitable for prediction, as it can lead to overfitting. These diagrams were generated with the following code: <span class="code">ggplot(allData, aes(x=attribute, fill=classe)) + geom_histogram()</span>.
 			</div>
 
 			<a name="data-pre-proc"></a>
