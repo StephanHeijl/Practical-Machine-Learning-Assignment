@@ -93,13 +93,12 @@ This is a caption for the image. This image is derived from LoremPixel.com.
 			<p>
 				The Linear Discriminant Analysis Model was added as a benchmark, to find how effective algorithms better suited for non-linear data perform compared to linear optimized algorithms.
 				The detailed results for each of these algorithms can be found in the <a href="https://github.com/StephanHeijl/Practical-Machine-Learning-Assignment">Github repository</a>.
-				The results are summarized in table 1. You can click on the headers to sort the results.
-
+				The results are summarized in table 1. You can click on the headers to sort the results. All these tests were performed with 10-fold cross validation.
 			</p>
 
 			<div class="table-container">
 				<div class="table-caption">
-					Table 1: This table shows both the accuracy and time performances for each of the algorithms. The last column shows the time/performance ratio.
+					Table 1: This table shows both the accuracy and time performances for 10-fold cross validation for each of the algorithms. The last column shows the time/performance ratio.
 					Click on any of the headers to sort the table by that attribute.
 				</div>
 				<table class="sortable">
@@ -115,58 +114,65 @@ This is a caption for the image. This image is derived from LoremPixel.com.
 
 						<tr>
 							<td>RandomForest</td>
-							<td>0.9628</td>
-							<td>1394.734</td>
-							<td>14.49</td>
+							<td>0.9697</td>
+							<td>922.447</td>
+							<td>9.513</td>
 						</tr>
 
 						<tr>
 							<td>Parallel Random Forest</td>
-							<td>0.9623</td>
-							<td>726.125</td>
-							<td>7.54</td>
+							<td>0.9699</td>
+							<td>600.904</td>
+							<td>6.196
+							</td>
 						</tr>
 
 						<tr>
 							<td>AdaBag</td>
-							<td>0.42</td>
-							<td>2979.114</td>
-							<td>70.92</td>
+							<td>0.4138</td>
+							<td>1645.114</td>
+							<td>39.756
+							</td>
 						</tr>
 
 						<tr>
 							<td>Linear discriminant analysis</td>
-							<td>0.4708</td>
-							<td>14.256</td>
-							<td>0.302</td>
+							<td>0.4678</td>
+							<td>6.530</td>
+							<td>0.14
+							</td>
 						</tr>
 
 						<tr>
 							<td>Stochastic Gradient Boosting</td>
-							<td>0.7581</td>
-							<td>651.031</td>
-							<td>8.58</td>
+							<td>0.7574</td>
+							<td>533.162</td>
+							<td>7.039
+							</td>
 						</tr>
 
 						<tr>
 							<td>Adaboost</td>
-							<td>0.6842</td>
-							<td>8377.779</td>
-							<td>122.43</td>
+							<td>0.6769</td>
+							<td>3823.220</td>
+							<td>56.481
+							</td>
 						</tr>
 
 						<tr>
 							<td>Model Averaged Neural Network</td>
-							<td>0.5929</td>
-							<td>1639.671</td>
-							<td>27.64</td>
+							<td>0.5883</td>
+							<td>855.590</td>
+							<td>14.543
+							</td>
 						</tr>
 
 						<tr>
 							<td>Naive Bayes</td>
-							<td>0.556</td>
-							<td>696.021</td>
-							<td>12.51</td>
+							<td>0.5574</td>
+							<td>125.745</td>
+							<td>2.256
+							</td>
 						</tr>
 
 					</tbody>
@@ -174,7 +180,7 @@ This is a caption for the image. This image is derived from LoremPixel.com.
 			</div>
 
 			<p>
-				Both algorithms based on RandomForest yield the highest accuracy scores for the tests. The Parallel Random Forest algorithm, however was almost twice as fast. This is further analyzed in the "Optimization of Random Forest algorithm" section below.
+				Both algorithms based on RandomForest yield the highest accuracy scores for the tests. The Parallel Random Forest algorithm, however was over 50% faster. This is further analyzed in the "Optimization of Random Forest algorithm" section below.
 			</p>
 
 			<p>
@@ -200,7 +206,7 @@ This is a caption for the image. This image is derived from LoremPixel.com.
 
 			<p>
 				An example of this is shown with the Parallel RandomForest algorithm. This implementation has a lower <span class="code">n_trees</span> argument of 250.
-				Profiling the code unfortunately showed no real world parallelization in my instance, but lowering the amount of trees still increased speeds by almost 50%. There was no significant impact on accuracy. I project a further increase in speed if the parallelization is actually fully enabled.
+				Profiling the code unfortunately showed no real world parallelization in my instance, but lowering the amount of trees still increased speeds by over 50%. There was no significant impact on accuracy. I project a further increase in speed if the parallelization is actually fully enabled.
 			</p>
 
 			<img src="./ParallelRandomForestCPUActivity.png" />
@@ -216,7 +222,7 @@ This is a caption for the image. This image is derived from LoremPixel.com.
 
 			<div class="table-container">
 				<div class="table-caption">
-					Table 2: This shows the confusion matrix for the results achieved by parRF. A high amount of true positives can be found across the board. The most significant case of false classifications can be found in the C row, where 25 cases were predicted to be C, while they actually belonged to the D classe.
+					Table 2: This shows the confusion matrix for the results achieved by parRF. A high amount of true positives can be found across the board. These are based on the average scores for the cross validation, so the total is a little bit off from the sample size of 19662.
 				</div>
 				<table>
 					<thead>
@@ -229,77 +235,48 @@ This is a caption for the image. This image is derived from LoremPixel.com.
 							<td>E</td>
 						</tr>
 					</thead>
-					<tbody>
-
-						<tr>
-							<td>A</td>
-							<td>1087</td>
+					<tbody><tr><td>A</td>
+						<td>5435</td>
+						<td>98</td>
+						<td>39</td>
+						<td>20</td>
+						<td>20</td>
+						</tr>
+						<tr><td>B</td>
+							<td>39</td>
+							<td>3591</td>
+							<td>59</td>
 							<td>20</td>
-							<td>7</td>
-							<td>3</td>
-							<td>0</td>
+							<td>39</td>
 						</tr>
-
-						<tr>
-							<td>B</td>
-							<td>8</td>
-							<td>714</td>
-							<td>6</td>
-							<td>0</td>
-							<td>8</td>
+						<tr><td>C</td>
+							<td>59</td>
+							<td>98</td>
+							<td>3257</td>
+							<td>157</td>
+							<td>39</td>
 						</tr>
-
-						<tr>
-							<td>C</td>
-							<td>11</td>
-							<td>16</td>
-							<td>659</td>
-							<td>25</td>
-							<td>6</td>
+						<tr><td>D</td>
+							<td>39</td>
+							<td>20</td>
+							<td>39</td>
+							<td>3002</td>
+							<td>39</td>
 						</tr>
-
-						<tr>
-							<td>D</td>
-							<td>8</td>
-							<td>6</td>
-							<td>10</td>
-							<td>614</td>
-							<td>6</td>
+						<tr><td>E</td>
+							<td>20</td>
+							<td>20</td>
+							<td>20</td>
+							<td>20</td>
+							<td>3512</td>
 						</tr>
-						<tr>
-							<td>E</td>
-							<td>2</td>
-							<td>3</td>
-							<td>2</td>
-							<td>1</td>
-							<td>701</td>
-						</tr>
-
 					</tbody>
 				</table>
 			</div>
 
-			<p>&nbsp;</p>
-
-			<div class="table-container">
-				<div class="table-caption">
-					Table 3: Various other metrics produced by the <span class='code'>ConfusionMatrix()</span> function. All classes show 91%+ correct prediction results.
-				</div>
-				<table class="sortable">
-<thead><tr><td>Classe</td><td>Sensitivity</td><td>Specificity</td><td>Pos Pred Value</td><td>Neg Pred Value</td><td>Prevalence</td><td>Detection Rate</td><td>Detection Prevalence</td><td>Balanced Accuracy</td></tr></thead>
-					<tbody>
-<tr><td>A</td><td>0.974</td><td>0.9893</td><td>0.9731</td><td>0.9897</td><td>0.2845</td><td>0.2771</td><td>0.2847</td><td>0.9817</td></tr>
-<tr><td>B</td><td>0.9407</td><td>0.993</td><td>0.9701</td><td>0.9859</td><td>0.1935</td><td>0.182</td><td>0.1876</td><td>0.9669</td></tr>
-<tr><td>C</td><td>0.9635</td><td>0.9821</td><td>0.9191</td><td>0.9922</td><td>0.1744</td><td>0.168</td><td>0.1828</td><td>0.9728</td></tr>
-<tr><td>D</td><td>0.9549</td><td>0.9909</td><td>0.9534</td><td>0.9912</td><td>0.1639</td><td>0.1565</td><td>0.1642</td><td>0.9729</td></tr>
-<tr><td>E</td><td>0.9723</td><td>0.9975</td><td>0.9887</td><td>0.9938</td><td>0.1838</td><td>0.1787</td><td>0.1807</td><td>0.9849</td></tr>
-						</tbody>
-</table>
-
-			</div>
 
 			<p>
-				In conclusion, an overall accuracy of 96.23% was achieved, with a Kappa value of 95.23%. Based on the interpretations of multiple researchers<a class="cite" href="#cite-3">[3]</a><a class="cite" href="#cite-4">[4]</a> this constitutes an "Excellent" or "Near perfect" conformance to the data. As such, I deem this model as usable for the task at hand.
+				In conclusion, an overall accuracy of 96.99% was achieved in the cross validation test, with a Kappa value of 96.2%. Based on the cross-validation test, I estimate the out-of-sample error rate to be approximately 3%. Based on the interpretations of multiple researchers<a class="cite" href="#cite-3">[3]</a><a class="cite" href="#cite-4">[4]</a> this constitutes an "Excellent" or "Near perfect" conformance to the data. As such, I deem this model as usable for the task at hand.
 			</p>
 
 			<a name="r-script"></a>
@@ -313,36 +290,28 @@ allData <span style="">&lt;-</span> <a href="http://inside-r.org/r-doc/utils/rea
 &nbsp;
 variantData <span style="">&lt;-</span> allData<span style="color: #009900;">&#91;</span><span style="color: #339933;">,</span><span style="">-</span><a href="http://inside-r.org/r-doc/base/c"><span style="color: #003399; font-weight: bold;">c</span></a><span style="color: #009900;">&#40;</span>nearZeroVar<span style="color: #009900;">&#40;</span> allData<span style="color: #339933;">,</span> saveMetrics=F<span style="color: #339933;">,</span> freqCut = <span style="color: #cc66cc;">95</span><span style="">/</span><span style="color: #cc66cc;">45</span><span style="color: #009900;">&#41;</span><span style="color: #009900;">&#41;</span><span style="color: #009900;">&#93;</span>
 metaCols <span style="">&lt;-</span> <a href="http://inside-r.org/r-doc/base/c"><span style="color: #003399; font-weight: bold;">c</span></a><span style="color: #009900;">&#40;</span><span style="color: #cc66cc;">1</span><span style="color: #339933;">,</span><span style="color: #cc66cc;">2</span><span style="color: #339933;">,</span><span style="color: #cc66cc;">3</span><span style="color: #339933;">,</span><span style="color: #cc66cc;">4</span><span style="color: #339933;">,</span><span style="color: #cc66cc;">5</span><span style="color: #339933;">,</span><span style="color: #cc66cc;">6</span><span style="color: #009900;">&#41;</span> <span style="color: #666666; font-style: italic;"># Columns with metadata</span>
-relevantData <span style="">&lt;-</span> variantData<span style="color: #009900;">&#91;</span><span style="">-</span>metaCols<span style="color: #009900;">&#93;</span>
+trainingData <span style="">&lt;-</span> variantData<span style="color: #009900;">&#91;</span><span style="">-</span>metaCols<span style="color: #009900;">&#93;</span>
 &nbsp;
 <a href="http://inside-r.org/r-doc/base/set.seed"><span style="color: #003399; font-weight: bold;">set.seed</span></a><span style="color: #009900;">&#40;</span><span style="color: #cc66cc;">1</span><span style="color: #009900;">&#41;</span>
 &nbsp;
-dp <span style="">&lt;-</span> createDataPartition<span style="color: #009900;">&#40;</span>y=relevantData<span style="">$</span>classe<span style="color: #339933;">,</span> p=<span style="color: #cc66cc;">0.80</span><span style="color: #009900;">&#41;</span><span style="color: #009900;">&#91;</span><span style="color: #009900;">&#91;</span><span style="color: #cc66cc;">1</span><span style="color: #009900;">&#93;</span><span style="color: #009900;">&#93;</span>
-trainingData <span style="">&lt;-</span> relevantData<span style="color: #009900;">&#91;</span>dp<span style="color: #339933;">,</span><span style="color: #009900;">&#93;</span>
-testingData <span style="">&lt;-</span> relevantData<span style="color: #009900;">&#91;</span><span style="">-</span>dp<span style="color: #339933;">,</span><span style="color: #009900;">&#93;</span>
-&nbsp;
-<span style="color: #666666; font-style: italic;"># Shuffle data for testing purposes</span>
-shuffledTesting <span style="">&lt;-</span> testingData<span style="color: #009900;">&#91;</span><a href="http://inside-r.org/r-doc/base/sample"><span style="color: #003399; font-weight: bold;">sample</span></a><span style="color: #009900;">&#40;</span><a href="http://inside-r.org/r-doc/base/nrow"><span style="color: #003399; font-weight: bold;">nrow</span></a><span style="color: #009900;">&#40;</span>testingData<span style="color: #009900;">&#41;</span><span style="color: #009900;">&#41;</span><span style="color: #339933;">,</span><span style="color: #009900;">&#93;</span>
-shuffledTraining <span style="">&lt;-</span> trainingData<span style="color: #009900;">&#91;</span><a href="http://inside-r.org/r-doc/base/sample"><span style="color: #003399; font-weight: bold;">sample</span></a><span style="color: #009900;">&#40;</span><a href="http://inside-r.org/r-doc/base/nrow"><span style="color: #003399; font-weight: bold;">nrow</span></a><span style="color: #009900;">&#40;</span>trainingData<span style="color: #009900;">&#41;</span><span style="color: #009900;">&#41;</span><span style="color: #339933;">,</span><span style="color: #009900;">&#93;</span>
-&nbsp;
-ctrl <span style="">&lt;-</span> trainControl<span style="color: #009900;">&#40;</span>preProcOptions = <a href="http://inside-r.org/r-doc/base/list"><span style="color: #003399; font-weight: bold;">list</span></a><span style="color: #009900;">&#40;</span>thresh = <span style="color: #cc66cc;">0.8</span><span style="color: #009900;">&#41;</span><span style="color: #339933;">,</span> allowParallel=T<span style="color: #009900;">&#41;</span>
-trainN <span style="">&lt;-</span> <a href="http://inside-r.org/r-doc/base/nrow"><span style="color: #003399; font-weight: bold;">nrow</span></a><span style="color: #009900;">&#40;</span>trainingData<span style="color: #009900;">&#41;</span>
-testN <span style="">&lt;-</span> <a href="http://inside-r.org/r-doc/base/nrow"><span style="color: #003399; font-weight: bold;">nrow</span></a><span style="color: #009900;">&#40;</span>testingData<span style="color: #009900;">&#41;</span>
+ctrl <span style="">&lt;-</span> trainControl<span style="color: #009900;">&#40;</span>	preProcOptions = <a href="http://inside-r.org/r-doc/base/list"><span style="color: #003399; font-weight: bold;">list</span></a><span style="color: #009900;">&#40;</span>thresh = <span style="color: #cc66cc;">0.8</span><span style="color: #009900;">&#41;</span><span style="color: #339933;">,</span>
+						allowParallel=T<span style="color: #339933;">,</span>
+						savePredictions=T<span style="color: #339933;">,</span>
+						method = <span style="color: #0000ff;">&quot;repeatedcv&quot;</span><span style="color: #339933;">,</span>
+						number = <span style="color: #cc66cc;">10</span>
+						<span style="color: #009900;">&#41;</span>
 &nbsp;
 ptm <span style="">&lt;-</span> <a href="http://inside-r.org/r-doc/base/proc.time"><span style="color: #003399; font-weight: bold;">proc.time</span></a><span style="color: #009900;">&#40;</span><span style="color: #009900;">&#41;</span> <span style="color: #666666; font-style: italic;"># Clock time taken</span>
 &nbsp;
 args<span style="">&lt;-</span><a href="http://inside-r.org/r-doc/base/commandArgs"><span style="color: #003399; font-weight: bold;">commandArgs</span></a><span style="color: #009900;">&#40;</span><span style="color: #000000; font-weight: bold;">TRUE</span><span style="color: #009900;">&#41;</span> <span style="color: #666666; font-style: italic;"># Use of command line arguments allows for easier parallelization with a bash script.</span>
 trainingMethod <span style="">&lt;-</span> <a href="http://inside-r.org/r-doc/base/args"><span style="color: #003399; font-weight: bold;">args</span></a><span style="color: #009900;">&#91;</span><span style="color: #cc66cc;">1</span><span style="color: #009900;">&#93;</span>
 &nbsp;
-modelFit <span style="">&lt;-</span> train<span style="color: #009900;">&#40;</span> classe <span style="">~</span> .<span style="color: #339933;">,</span> <a href="http://inside-r.org/r-doc/utils/data"><span style="color: #003399; font-weight: bold;">data</span></a>=shuffledTraining<span style="color: #009900;">&#91;</span><span style="color: #cc66cc;">1</span><span style="">:</span>trainN<span style="color: #339933;">,</span><span style="color: #009900;">&#93;</span><span style="color: #339933;">,</span> method=trainingMethod<span style="color: #339933;">,</span> trControl=ctrl<span style="color: #339933;">,</span> preProcess=<span style="color: #0000ff;">'pca'</span> <span style="color: #009900;">&#41;</span>
-<a href="http://inside-r.org/r-doc/base/warnings"><span style="color: #003399; font-weight: bold;">warnings</span></a><span style="color: #009900;">&#40;</span><span style="color: #009900;">&#41;</span>
+modelFit <span style="">&lt;-</span> train<span style="color: #009900;">&#40;</span> classe <span style="">~</span> .<span style="color: #339933;">,</span> <a href="http://inside-r.org/r-doc/utils/data"><span style="color: #003399; font-weight: bold;">data</span></a>=trainingData<span style="color: #339933;">,</span> method=trainingMethod<span style="color: #339933;">,</span> trControl=ctrl<span style="color: #339933;">,</span> preProcess=<span style="color: #0000ff;">'pca'</span> <span style="color: #009900;">&#41;</span>
 modelFit
 &nbsp;
 <a href="http://inside-r.org/r-doc/base/proc.time"><span style="color: #003399; font-weight: bold;">proc.time</span></a><span style="color: #009900;">&#40;</span><span style="color: #009900;">&#41;</span> <span style="">-</span> ptm <span style="color: #666666; font-style: italic;"># Stop the timer and echo result</span>
 &nbsp;
-results <span style="">&lt;-</span> <a href="http://inside-r.org/r-doc/stats/predict"><span style="color: #003399; font-weight: bold;">predict</span></a><span style="color: #009900;">&#40;</span>modelFit<span style="color: #339933;">,</span> newdata=shuffledTesting<span style="color: #009900;">&#91;</span><span style="color: #cc66cc;">1</span><span style="">:</span>testN<span style="color: #339933;">,</span><span style="color: #009900;">&#93;</span><span style="color: #009900;">&#41;</span>
-&nbsp;
-confusionMatrix<span style="color: #009900;">&#40;</span>results<span style="color: #339933;">,</span> shuffledTesting<span style="color: #009900;">&#91;</span><span style="color: #cc66cc;">1</span><span style="">:</span>testN<span style="color: #339933;">,</span><span style="color: #009900;">&#93;</span><span style="">$</span>classe<span style="color: #009900;">&#41;</span></pre></div></div><p>
+confusionMatrix<span style="color: #009900;">&#40;</span>modelFit<span style="color: #009900;">&#41;</span></pre></div></div>
 			<small>Produced with the Pretty R syntax Highlighter<a class="cite" href="#cite-2">[2]</a></small>
 
 			<!-- SCRIPT END -->
