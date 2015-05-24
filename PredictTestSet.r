@@ -12,8 +12,6 @@ testingData <- read.csv("pml-testing.csv",header=T) # Load testing file
 set.seed(1)
 
 ctrl <- trainControl(preProcOptions = list(thresh = 0.8), allowParallel=T)
-trainN <- nrow(trainingData)
-testN <- nrow(testingData)
 
 modelFit <- train( classe ~ ., data=trainingData, method="parRF", trControl=ctrl, preProcess='pca' )
 modelFit
