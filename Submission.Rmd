@@ -2,7 +2,11 @@ Practical Machine Learning Course Submission
 ============================================
 Stephan Heijl, 14/05/2015
 
-This is my submission for the Practical Machine Learning Course. I approached this project in the following fashion:
+This is my submission for the Practical Machine Learning Course. 
+Please note that this submission is better viewed on the github pages site (http://stephanheijl.github.io/Practical-Machine-Learning-Assignment/) or as
+the compiled HTML file.
+
+I approached this project in the following fashion:
 
 Exploratory Data visualization using Weka
 Data preprocessing
